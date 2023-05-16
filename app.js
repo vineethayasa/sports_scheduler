@@ -27,7 +27,7 @@ app.get('/login', (request, response) => {
 
 app.post('/users', async (request, response) => {
     try {
-      const user = await User.create({
+      const user = await User.addTodo({
         firstName: request.body.firstName,
         lastName: request.body.lastName,
         email: request.body.email,

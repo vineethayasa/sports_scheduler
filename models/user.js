@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+    static addTodo ({ firstName,lastName,email,password,role }) {
+      return this.create({ firstName,lastName,email,password,role })
+    }
   }
   User.init({
     firstName: DataTypes.STRING,
