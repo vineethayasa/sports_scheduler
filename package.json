@@ -4,8 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "test": "jest",
+    "prepare": "cd .. && husky install sports_scheduler/.husky"
   },
   "author": "vineetha",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "jest": "^29.5.0"
+  }
 }
