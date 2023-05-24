@@ -40,14 +40,16 @@
                     </select>
                 </div>
                 <div class="py-3"> 
-                    <button type="submit" class="mb-6 text-white bg-indigo-600 hover:bg-indigo-800 font-medium rounded px-5 py-2">Sign up</button>        
+                    <button type="submit" class="mb-2 text-white bg-indigo-600 hover:bg-indigo-800 font-medium rounded px-5 py-2">Sign up</button>        
                 </div>  
             </form>
-            <% if(messages && messages.error && messages.error.length > 0)  { %>
-                <% for(var i=0; i<messages.error.length; i++) { %>
-                        <li> <%= messages.error[i] %></li>
+            <div class="mb-6">
+                <% if(messages && messages.error && messages.error.length > 0)  { %>
+                  <% for(var i=0; i<messages.error.length; i++) { %>
+                          <li> <%= messages.error[i] %></li>
+                  <% } %>
                 <% } %>
-              <% } %>
+              </div>
         </div>
     </div>
   </body>
