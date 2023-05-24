@@ -9,14 +9,16 @@
     <link href="./css/style.css" rel="stylesheet" />
   </head>
   <body>
+    <%- include("header.ejs") %> 
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
-            <h1 class="py-4 text-3xl">Welcome <%= name %> </h1>
-            <a href="/signout" class="hover:underline text-indigo-500">Signout</a>
-            <br>
-            <a href="/sport" class="underline text-indigo-700 text-xl">Create a new sport</a>
-            
+          <h1 class="py-4 text-3xl">Hey! <%- currentuser.firstName %> <%- currentuser.lastName %></h1>
+          <a href="/sport" class="underline text-indigo-700 text-xl">Create a new sport</a>
+          
+          <%- include('sportslist.ejs', {data: sportsnames}) %>
         </div>
+
+        
     </div>
   </body>
 </html>

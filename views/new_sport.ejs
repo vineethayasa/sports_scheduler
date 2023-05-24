@@ -10,8 +10,10 @@
     <link href="./css/style.css" rel="stylesheet" />
   </head>
   <body>
+    <%- include("header.ejs") %> 
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2">
+           
             <h6 class="py-4 text-2xl">Create a new sport</h6>
             <form action="/sport" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">                

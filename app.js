@@ -101,21 +101,15 @@ app.get('/signout', (request, response, next) => {
   })
 })
 
-app.get('/home', (request, response) => {
+app.get('/home',async (request, response) => {
+  const loggedinUser = request.user.id;
+  const currentuser = await User.getUser(loggedinUser)
+  const sportsnames = await Sport.getSports()
   response.render('home', {
-    name: request.body.firstName,
-    role:request.body.role,
+    currentuser,
+    sportsnames,
     csrfToken: request.csrfToken()
   })
-})
-app.get('/users', async (request, response) => {
-    try {
-        const users = await User.findAll();
-        return response.send(users);
-      } catch (error) {
-        console.log(error);
-        return response.status(422).json(error);
-      }
 })
 
 app.post('/session', passport.authenticate('local', {

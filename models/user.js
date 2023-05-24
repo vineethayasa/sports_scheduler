@@ -15,6 +15,9 @@ module.exports = (sequelize, DataTypes) => {
     static addUser ({ firstName,lastName,email,password,role }) {
       return this.create({ firstName,lastName,email,password,role })
     }
+    static async getUser(userId) {
+      return this.findByPk(userId);
+    }
   }
   User.init({
     firstName: DataTypes.STRING,
