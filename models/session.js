@@ -11,6 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Session.belongsTo(models.Sport, {
+        foreignKey: "sportId",
+      });
+      Session.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
+    }
+    static addSession ({ name,date,address,players,count,cancelled,sportId,userId }) {
+      return this.create({ name,date,address,players,count,cancelled,sportId,userId })
     }
   }
   Session.init({

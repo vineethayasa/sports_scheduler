@@ -11,12 +11,24 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Sport.hasMany(models.Session, {
+        foreignKey: "sportId",
+      })
+    }
+    static addSport ({ sport_name }) {
+      return this.create({ sport_name })
     }
     static getSports() {
       return this.findAll()
     }
     static getSportById(id) {
       return this.findByPk(id);
+    }
+    static async getSportByName(name) {
+      const getSport = await this.findOne({
+        where: { sport_name: name },
+      })
+      return getSport
     }
   }
   Sport.init({

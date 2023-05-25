@@ -1,6 +1,4 @@
-/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
-
 const { request, response } = require('express')
 const express = require('express')
 const app = express()
@@ -137,7 +135,7 @@ app.post('/users', async (request, response) => {
     const hashedPwd = await bcyrpt.hash(request.body.password, saltRounds)
     console.log(hashedPwd)
     try {
-      const user = await User.create({
+      const user = await User.addUser({
         firstName: request.body.firstName,
         lastName: request.body.lastName,
         email: request.body.email,
@@ -161,9 +159,10 @@ app.post('/users', async (request, response) => {
 app.get('/sport',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   response.render('new_sport', { csrfToken: request.csrfToken() })
 })
-app.get('/sportsession',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
+app.get('/sportsession/:sport_name',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   const data = await User.getAllUsers()
-  response.render('sportsessions', { data, csrfToken: request.csrfToken() })
+  const current_sport_name = request.params.sport_name
+  response.render('sportsessions', { data,current_sport_name, csrfToken: request.csrfToken() })
 })
 app.get('/sport_main/:id',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   console.log(request.params.id)
@@ -178,10 +177,11 @@ app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response
     return response.redirect('/sport')
   }
   try {
-    const sport = await Sport.create({
+    const sport = await Sport.addSport({
       sport_name: request.body.sport_name,
     })
-    response.redirect('/sportsession')
+    console.log(sport.sport_name)
+    response.redirect('/home')
   } catch (error) {
     console.log(error)
     request.flash('error', error.errors[0].message)
@@ -190,20 +190,34 @@ app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response
 })
 
 app.post('/sportsession', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
+  const sport = await Sport.getSportByName(request.body.name)
   try {
-    const sport = await Session.create({
+    const session = await Session.addSession({
+      
+      name: request.body.name,
       date: request.body.date,
       address: request.body.address,
       players: request.body.players,
       count:request.body.count,
       cancelled:false,
+      sportId:sport.id,
+      userId:request.user.id
+      
     })
-    response.redirect('/sport_main')
+    console.log(session)
+    response.redirect('/signup')
   } catch (error) {
     console.log(error)
-    request.flash('error', error.errors[0].message)
-    response.redirect('/sportsession')
+    response.redirect('/')
   }
 })
-
+app.get('/allsessions', async (request, response) => {
+  try {
+      const sessions = await Session.findAll();
+      return response.send(sessions);
+    } catch (error) {
+      console.log(error);
+      return response.status(422).json(error);
+    }
+})
 module.exports = app

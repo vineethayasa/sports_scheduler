@@ -7,15 +7,15 @@
     <meta name="csrf-token" content= "<%= csrfToken %>">
     <link href="./css/styles.css" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="./css/style.css" rel="stylesheet" />
   </head>
   <body>
     <%- include("header.ejs") %> 
     <div class="grid grid-cols-6">
         <div class="col-start-3 col-span-2 ">
-            <h6 class="py-4 text-2xl font-bold">Create new session</h6>
-            <form>
+            <h6 class="py-4 text-2xl font-bold">Create new <%= current_sport_name %> session</h6>
+            <form action="/sportsession" method="post">
                 <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="name" value="<%= current_sport_name %>">
                 <div class="py-3">
                     <label for="date">When will this sport session be held?</label>
                     <input type="datetime-local" name="date" class="required border border-gray-300 text-gray-900 rounded p-2 w-full">
@@ -29,7 +29,7 @@
                     <select name="players" id="players" multiple class="border border-gray-300 text-gray-900 rounded p-2 w-full">
                             <option value="none" selected disabled hidden>Select players</option>
                             <% for (var i =0; i <data.length;  i++ ) { %>
-                                        <option value=<%= data[i].sport_name %>>
+                                        <option value="<%= data[i].id %>">
                                             <%= data[i].firstName %>
                                         </option>
                             <% } %>                        
