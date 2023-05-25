@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     static async getUser(userId) {
       return this.findByPk(userId);
     }
+    static getAllUsers () {
+      return this.findAll()
+    }
   }
   User.init({
     firstName: DataTypes.STRING,

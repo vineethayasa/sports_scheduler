@@ -6,7 +6,7 @@ const express = require('express')
 const app = express()
 const csrf = require('tiny-csrf')
 
-const { User, Sport } = require('./models')
+const { User, Sport ,Session } = require('./models')
 
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
@@ -101,7 +101,7 @@ app.get('/signout', (request, response, next) => {
   })
 })
 
-app.get('/home',async (request, response) => {
+app.get('/home', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   const loggedinUser = request.user.id;
   const currentuser = await User.getUser(loggedinUser)
   const sportsnames = await Sport.getSports()
@@ -158,12 +158,21 @@ app.post('/users', async (request, response) => {
     }
 })
 
-app.get('/sport',async (request, response) => {
+app.get('/sport',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   response.render('new_sport', { csrfToken: request.csrfToken() })
 })
+app.get('/sportsession',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
+  const data = await User.getAllUsers()
+  response.render('sportsessions', { data, csrfToken: request.csrfToken() })
+})
+app.get('/sport_main/:id',connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
+  console.log(request.params.id)
+  const current_sport = await Sport.getSportById(request.params.id)
+  console.log(current_sport.sport_name)
+  response.render('sport_main', { current_sport, csrfToken: request.csrfToken() })
+})
 
-
-app.post('/sport', async (request, response) => {
+app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   if (!request.body.sport_name) {
     request.flash('error', 'Sport name cannot be empty')
     return response.redirect('/sport')
@@ -177,6 +186,23 @@ app.post('/sport', async (request, response) => {
     console.log(error)
     request.flash('error', error.errors[0].message)
     response.redirect('/sport')
+  }
+})
+
+app.post('/sportsession', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
+  try {
+    const sport = await Session.create({
+      date: request.body.date,
+      address: request.body.address,
+      players: request.body.players,
+      count:request.body.count,
+      cancelled:false,
+    })
+    response.redirect('/sport_main')
+  } catch (error) {
+    console.log(error)
+    request.flash('error', error.errors[0].message)
+    response.redirect('/sportsession')
   }
 })
 

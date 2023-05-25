@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="csrf-token" content= "<%= csrfToken %>">
+    <link href="./css/styles.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <%- include("header.ejs") %> 
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+           
+            <h6 class="py-4 text-2xl"><%= current_sport.sport_name %></h6>
+            <a href="/sportsession" class="underline text-indigo-700 text-xl">Create a new sport session</a>
+
+            <% if(messages && messages.error && messages.error.length > 0)  { %>
+                <% for(var i=0; i<messages.error.length; i++) { %>
+                        <li> <%= messages.error[i] %></li>
+                <% } %>
+              <% } %>
+        </div>
+    </div>
+  </body>
+</html>

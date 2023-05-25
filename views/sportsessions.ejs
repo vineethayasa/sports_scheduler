@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="csrf-token" content= "<%= csrfToken %>">
+    <link href="./css/styles.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <%- include("header.ejs") %> 
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2 ">
+            <h6 class="py-4 text-2xl font-bold">Create new session</h6>
+            <form>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="py-3">
+                    <label for="date">When will this sport session be held?</label>
+                    <input type="datetime-local" name="date" class="required border border-gray-300 text-gray-900 rounded p-2 w-full">
+                </div>
+                <div class="py-3">
+                    <label for="address">Where will this session be played?</label>
+                    <input type="text" name="address" class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                </div>   
+                <div class="py-3"> 
+                    <label for="players">Who all will be joining you in this session? <br> ( ctrl+click for multiselect )</label>
+                    <select name="players" id="players" multiple class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                            <option value="none" selected disabled hidden>Select players</option>
+                            <% for (var i =0; i <data.length;  i++ ) { %>
+                                        <option value=<%= data[i].sport_name %>>
+                                            <%= data[i].firstName %>
+                                        </option>
+                            <% } %>                        
+                    </select>
+                </div>
+                
+                <div class="py-3"> 
+                    <label for="count">How many more players do you need?</label>
+                    <input type="number" name="count" class="border border-gray-300 text-gray-900 rounded p-2 w-full">
+                </div>                   
+                <div class="py-3"> 
+                    <button type="submit" class="mb-2 text-white bg-indigo-600 hover:bg-indigo-800 font-medium rounded px-5 py-2">Submit</button>        
+                </div>  
+            </form>
+            <div class="mb-6">
+                <% if(messages && messages.error && messages.error.length > 0)  { %>
+                  <% for(var i=0; i<messages.error.length; i++) { %>
+                          <li> <%= messages.error[i] %></li>
+                  <% } %>
+                <% } %>
+              </div>
+        </div>
+    </div>
+  </body>
+</html>
