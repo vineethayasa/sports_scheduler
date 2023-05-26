@@ -1,7 +1,4 @@
 body{
     background-color:#c7d2fe;
     font-family:monospace,'Courier';
-}
-.Todo-Item:hover .trash-icon{
-    display:block;
-}  
+} 
