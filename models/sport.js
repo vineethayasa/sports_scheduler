@@ -14,9 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       Sport.hasMany(models.Session, {
         foreignKey: "sportId",
       })
+      Sport.belongsTo(models.User, {
+        foreignKey: "userId",
+      })
     }
-    static addSport ({ sport_name }) {
-      return this.create({ sport_name })
+    static addSport ({ sport_name,userId }) {
+      return this.create({ sport_name,userId })
     }
     static getSports() {
       return this.findAll()

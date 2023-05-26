@@ -179,8 +179,10 @@ app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response
   try {
     const sport = await Sport.addSport({
       sport_name: request.body.sport_name,
+      userId:request.user.id
     })
     console.log(sport.sport_name)
+    console.log(sport)
     response.redirect('/home')
   } catch (error) {
     console.log(error)
