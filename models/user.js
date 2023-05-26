@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -18,25 +16,28 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
       });
     }
-    static addUser ({ firstName,lastName,email,password,role }) {
-      return this.create({ firstName,lastName,email,password,role })
+    static addUser({ firstName, lastName, email, password, role }) {
+      return this.create({ firstName, lastName, email, password, role });
     }
     static async getUser(userId) {
       return this.findByPk(userId);
     }
-    static getAllUsers () {
-      return this.findAll()
+    static getAllUsers() {
+      return this.findAll();
     }
   }
-  User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    role: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'User',
-  });
+  User.init(
+    {
+      firstName: DataTypes.STRING,
+      lastName: DataTypes.STRING,
+      email: DataTypes.STRING,
+      password: DataTypes.STRING,
+      role: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "User",
+    }
+  );
   return User;
 };

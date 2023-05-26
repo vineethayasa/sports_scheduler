@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Session extends Model {
     /**
@@ -18,24 +16,45 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "userId",
       });
     }
-    static addSession ({ name,date,address,players,count,cancelled,sportId,userId }) {
-      return this.create({ name,date,address,players,count,cancelled,sportId,userId })
+    static addSession({
+      name,
+      date,
+      address,
+      players,
+      count,
+      cancelled,
+      sportId,
+      userId,
+    }) {
+      return this.create({
+        name,
+        date,
+        address,
+        players,
+        count,
+        cancelled,
+        sportId,
+        userId,
+      });
     }
     static getSessions() {
-      return this.findAll()
+      return this.findAll();
     }
   }
-  Session.init({
-    name: DataTypes.STRING,
-    date: DataTypes.DATE,
-    address: DataTypes.STRING,
-    players: DataTypes.ARRAY(DataTypes.STRING),
-    count: DataTypes.INTEGER,
-    cancelled: DataTypes.BOOLEAN,
-    reason: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Session',
-  });
+  Session.init(
+    {
+      name: DataTypes.STRING,
+      date: DataTypes.DATE,
+      address: DataTypes.STRING,
+      players: DataTypes.ARRAY(DataTypes.STRING),
+      count: DataTypes.INTEGER,
+      cancelled: DataTypes.BOOLEAN,
+      reason: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "Session",
+    }
+  );
   return Session;
 };

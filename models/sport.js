@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Sport extends Model {
     /**
@@ -13,16 +11,16 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       Sport.hasMany(models.Session, {
         foreignKey: "sportId",
-      })
+      });
       Sport.belongsTo(models.User, {
         foreignKey: "userId",
-      })
+      });
     }
-    static addSport ({ sport_name,userId }) {
-      return this.create({ sport_name,userId })
+    static addSport({ sport_name, userId }) {
+      return this.create({ sport_name, userId });
     }
     static getSports() {
-      return this.findAll()
+      return this.findAll();
     }
     static getSportById(id) {
       return this.findByPk(id);
@@ -30,15 +28,18 @@ module.exports = (sequelize, DataTypes) => {
     static async getSportByName(name) {
       const getSport = await this.findOne({
         where: { sport_name: name },
-      })
-      return getSport
+      });
+      return getSport;
     }
   }
-  Sport.init({
-    sport_name: DataTypes.STRING
-  }, {
-    sequelize,
-    modelName: 'Sport',
-  });
+  Sport.init(
+    {
+      sport_name: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "Sport",
+    }
+  );
   return Sport;
 };
