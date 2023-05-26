@@ -10,26 +10,27 @@
   </head>
   <body>
     <%- include("header.ejs") %> 
-    <div class="grid grid-cols-6">
-        <div class="col-start-3 col-span-2">
-           
-            <h6 class="py-4 text-2xl">Create a new sport</h6>
-            <form action="/sport" method="post">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">                
-                <div class="py-3">
-                    <label for="sport_name">Enter sport's name</label>
-                    <input type="sport_name" name="sport_name" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
-                </div>  
-                <div class="py-3"> 
-                    <button type="submit" class="text-white bg-indigo-600 hover:bg-indigo-800 font-medium rounded px-5 py-2">Submit</button>        
-                </div>  
-            </form>
-            <% if(messages && messages.error && messages.error.length > 0)  { %>
-                <% for(var i=0; i<messages.error.length; i++) { %>
-                        <li> <%= messages.error[i] %></li>
-                <% } %>
-              <% } %>
+    <div class="flex items-center justify-center h-screen">
+      <div class="bg-indigo-100 rounded-lg shadow-lg p-10">
+        <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Create a new sport</h2>
+        <form action="/sport" method="post">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="mb-6">
+            <label for="sport_name" class="text-indigo-700">Enter sport's name</label>
+            <input type="text" name="sport_name" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+          </div>
+          <div class="flex justify-center">
+            <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">Submit</button>
+          </div>
+        </form>
+        <div class="mt-4 text-red-600">
+          <% if (messages && messages.error && messages.error.length > 0) { %>
+            <% messages.error.forEach(function(error) { %>
+              <p><%= error %></p>
+            <% }); %>
+          <% } %>
         </div>
+      </div>
     </div>
   </body>
 </html>

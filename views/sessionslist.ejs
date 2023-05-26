@@ -1,6 +1,6 @@
 <div class="mt-5">
     <% if (data.length > 0) { %>
-        <h1 class="text-2xl text-indigo-700 font-bold">Created by you</h1>
+        <h1 class="text-2xl text-indigo-700 font-bold mb-4">Created by you</h1>
         <ul class="list-disc">
             <% for (var i =0; i <data.length;  i++ ) { %>
                 <%if (userid==data[i].userId && sportid==data[i].sportId) { %>
@@ -12,7 +12,7 @@
                 <% } %>                    
             <% } %>
         </ul>
-        <h1 class="text-2xl text-indigo-700 font-bold">Other Sessions</h1>
+        <h1 class="text-2xl text-indigo-700 font-bold mb-4">Other Sessions</h1>
         <ul class="list-disc">
             <% for (var i =0; i <data.length;  i++ ) { %>
                 <%if (userid!=data[i].userId && sportid==data[i].sportId) { %>

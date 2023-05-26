@@ -8,13 +8,19 @@
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body>
-        <%- include("header.ejs") %>
-        <br>
-       <div class= "grid  grid-cols-6">
-        <div class="col-start-3 col-span-2"> 
-            <p class="py-2 text-xl">New User? <a href="/signup" class="text-indigo-600"> Sign-up now </a> </p>
-            <p class="py-2 text-xl">Existing User? <a href="/login" class="text-indigo-600">Sign-in</a></p>            
+        <div class="flex flex-col min-h-screen justify-center items-center bg-indigo-400">
+          <div class="text-7xl font-bold text-white text-shadow-lg">
+            SPORTS SCHEDULER
+          </div>
+          <div class="grid mt-20 gap-6">
+            <div class="flex justify-center">
+              <a href="/signup" class="py-4 px-6 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-800 hover:text-indigo-200 text-xl">Sign Up</a>
+            </div>
+            <div class="flex justify-center">
+              <a href="/login" class="py-4 px-6 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-800 hover:text-indigo-200 text-xl">Sign In</a>
+            </div>
+          </div>
         </div>
-       </div>
-    </body>
+      </body>
+      
 </html>
