@@ -10,7 +10,7 @@
   </head>
   <body class="bg-indigo-400">
     <div class="flex items-center justify-center min-h-screen">
-      <div class="bg-white rounded-lg shadow-lg p-10">
+      <div class="bg-indigo-100 rounded-lg shadow-lg p-10">
         <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Signup as a new user</h2>
         <form action="/users" method="post">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -30,7 +30,7 @@
             <label for="password" class="text-indigo-700">Password:</label>
             <input type="password" name="password" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
           </div>
-          <div class="mb-6">
+          <div class="mb-12">
             <label for="role" class="text-indigo-700">Role:</label>
             <select name="role" id="role" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
               <option value="none" selected disabled hidden>Select an Option</option>
@@ -43,11 +43,11 @@
           </div>
         </form>
         <div class="mt-4 text-red-600">
-          <% if (messages && messages.error && messages.error.length > 0) { %>
-            <% messages.error.forEach(function(error) { %>
-              <p><%= error %></p>
-            <% }); %>
-          <% } %>
+            <% if(messages && messages.error && messages.error.length > 0)  { %>
+                <% for(var i=0; i<messages.error.length; i++) { %>
+                        <li> <%= messages.error[i] %></li>
+                <% } %>
+            <% } %>
         </div>
       </div>
     </div>
