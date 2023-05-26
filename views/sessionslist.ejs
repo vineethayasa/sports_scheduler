@@ -1,0 +1,30 @@
+<div class="mt-5">
+    <% if (data.length > 0) { %>
+        <h1 class="text-2xl text-indigo-700 font-bold">Created by you</h1>
+        <ul class="list-disc">
+            <% for (var i =0; i <data.length;  i++ ) { %>
+                <%if (userid==data[i].userId && sportid==data[i].sportId) { %>
+                    <li class="Session-Item">
+                        <a class="flex items-center py-1 px-2 my-1 text-xl hover:underline" href="/session_main">
+                            Session # <%= data[i].id %>
+                        </a>
+                    </li>
+                <% } %>                    
+            <% } %>
+        </ul>
+        <h1 class="text-2xl text-indigo-700 font-bold">Other Sessions</h1>
+        <ul class="list-disc">
+            <% for (var i =0; i <data.length;  i++ ) { %>
+                <%if (userid!=data[i].userId && sportid==data[i].sportId) { %>
+                    <li class="Session-Item">
+                        <a class="flex items-center py-1 px-2 my-1 text-xl hover:underline" href="/session_main">
+                            Session # <%= data[i].id %>
+                        </a>
+                    </li>
+                <% } %>                    
+            <% } %>
+        </ul>
+    <%} else { %>
+        <p class="text-xl">There are no sessions available to join right now. Create one?</p>
+    <% } %>    
+</div>

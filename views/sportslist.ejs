@@ -1,5 +1,5 @@
-<% if (currentuser.role === 'Admin') { %>
-    <div class="mt-5">
+<div class="mt-5">
+    <% if (currentuser.role === 'Admin') { %>
         <% if (data.length > 0) { %>
             <h1 class="text-2xl text-indigo-700 font-bold">Created by you</h1>
             <ul class="list-disc">
@@ -28,9 +28,7 @@
         <%} else { %>
         <p class="text-xl">There are no sports available for scheduling a session</p>
         <% } %>
-    </div>
-<%} else { %>
-    <div class="mt-5">
+    <%} else { %>
         <% if (data.length > 0) { %>
             <h1 class="text-2xl text-indigo-700 font-bold">Here are the sports available</h1>
             <ul class="list-disc">
@@ -45,6 +43,5 @@
         <%} else { %>
         <p class="text-xl">There are no sports available for scheduling a session</p>
         <% } %>
-    </div>
 <% } %>
-    
+</div>

@@ -100,7 +100,7 @@ app.get('/signout', (request, response, next) => {
 })
 
 app.get('/home', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
-  const loggedinUser = request.user.id;
+  const loggedinUser = request.user.id
   const currentuser = await User.getUser(loggedinUser)
   const sportsnames = await Sport.getSports()
   response.render('home', {
@@ -168,7 +168,9 @@ app.get('/sport_main/:id',connectEnsureLogin.ensureLoggedIn(), async (request, r
   console.log(request.params.id)
   const current_sport = await Sport.getSportById(request.params.id)
   console.log(current_sport.sport_name)
-  response.render('sport_main', { current_sport, csrfToken: request.csrfToken() })
+  const sessionDetails = await Session.getSessions()
+  const userid = request.user.id
+  response.render('sport_main', { current_sport,sessionDetails,userid, csrfToken: request.csrfToken() })
 })
 
 app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
@@ -183,7 +185,8 @@ app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response
     })
     console.log(sport.sport_name)
     console.log(sport)
-    response.redirect('/home')
+    const url = `/sport_main/${sport.id}`
+    response.redirect(url)
   } catch (error) {
     console.log(error)
     request.flash('error', error.errors[0].message)
@@ -193,9 +196,28 @@ app.post('/sport', connectEnsureLogin.ensureLoggedIn(), async (request, response
 
 app.post('/sportsession', connectEnsureLogin.ensureLoggedIn(), async (request, response) => {
   const sport = await Sport.getSportByName(request.body.name)
+  const somename = request.body.name
+  const url=`/sportsession/${somename}`
+  if (!request.body.date) {
+    request.flash('error', 'Date cannot be empty')
+    return response.redirect(url)
+  }
+  if (!request.body.address) {
+    request.flash('error', 'Address cannot be empty')
+    return response.redirect(url)
+  }
+  console.log(request.body.players)
+
+  if (!request.body.players || request.body.players.length<2) {
+    request.flash('error', ' No. of players should be atleast 2')
+    return response.redirect(url)
+  }
+  if (!request.body.count) {
+    request.flash('error', 'Enter 0 if no extra players needed')
+    return response.redirect(url)
+  }
   try {
     const session = await Session.addSession({
-      
       name: request.body.name,
       date: request.body.date,
       address: request.body.address,
@@ -204,13 +226,16 @@ app.post('/sportsession', connectEnsureLogin.ensureLoggedIn(), async (request, r
       cancelled:false,
       sportId:sport.id,
       userId:request.user.id
-      
     })
+    console.log(url)
     console.log(session)
-    response.redirect('/signup')
+    const someid = sport.id
+    const url2=`/sport_main/${someid}`
+    response.redirect(url2)
   } catch (error) {
     console.log(error)
-    response.redirect('/')
+    request.flash('error', error.errors[0].message)
+    response.redirect(url)
   }
 })
 app.get('/allsessions', async (request, response) => {

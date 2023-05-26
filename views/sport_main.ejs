@@ -14,14 +14,14 @@
         <div class="col-start-3 col-span-2">
            
             <h6 class="py-4 text-3xl font-bold mb-4"><%= current_sport.sport_name %></h6>
-            <h1 class="text-2xl mb-2">Sessions</h1>
-            <a href="/sportsession/<%= current_sport.sport_name %>" class="underline text-indigo-700 text-xl">Create a new session</a>
-
-            <% if(messages && messages.error && messages.error.length > 0)  { %>
-                <% for(var i=0; i<messages.error.length; i++) { %>
-                        <li> <%= messages.error[i] %></li>
-                <% } %>
-              <% } %>
+            <h1 class="text-2xl mb-2 font-bold">Sessions</h1>
+            
+            <%- include('sessionslist', {data: sessionDetails, userid, sportid:current_sport.id}) %>
+            
+            <div style="display: flex;">
+              <a href="/sportsession/<%= current_sport.sport_name %>" class="underline text-indigo-700 text-xl mr-20">Create a new session</a>
+              <a href="/previoussession" class="underline text-indigo-700 text-xl">View previous sessions</a>
+            </div> 
         </div>
     </div>
   </body>

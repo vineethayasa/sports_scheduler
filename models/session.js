@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     static addSession ({ name,date,address,players,count,cancelled,sportId,userId }) {
       return this.create({ name,date,address,players,count,cancelled,sportId,userId })
     }
+    static getSessions() {
+      return this.findAll()
+    }
   }
   Session.init({
     name: DataTypes.STRING,
