@@ -149,6 +149,10 @@ app.post("/users", async (request, response) => {
     request.flash("error", "Password cannot be empty");
     return response.redirect("/signup");
   }
+  if (!request.body.role) {
+    request.flash("error", "Role cannot be empty");
+    return response.redirect("/signup");
+  }
   const hashedPwd = await bcyrpt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
   try {

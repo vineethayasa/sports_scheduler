@@ -61,45 +61,45 @@ describe("Sports Scheduler", function () {
     });
     expect(res.statusCode).toBe(302);
   });
-  test('Creating a sport as Admin', async () => {
-    const agent = request.agent(server)
-    await login(agent, 'vineetha@gmail.com', 'abcd')
-    const res = await agent.get('/sport')
-    const csrfToken = extractCsrfToken(res)
-    const response = await agent.post('/sport').send({
-      sport_name: 'Rugby',
-      _csrf: csrfToken
-    })
-    expect(response.statusCode).toBe(302)
-  })
-  test('Creating a session as Admin', async () => {
-    const agent = request.agent(server)
-    await login(agent, 'vineetha@gmail.com', 'abcd')
+  test("Creating a sport as Admin", async () => {
+    const agent = request.agent(server);
+    await login(agent, "vineetha@gmail.com", "abcd");
+    const res = await agent.get("/sport");
+    const csrfToken = extractCsrfToken(res);
+    const response = await agent.post("/sport").send({
+      sport_name: "Rugby",
+      _csrf: csrfToken,
+    });
+    expect(response.statusCode).toBe(302);
+  });
+  test("Creating a session as Admin", async () => {
+    const agent = request.agent(server);
+    await login(agent, "vineetha@gmail.com", "abcd");
     const res1 = await agent.get("/sport_main/1");
     expect(res1.statusCode).toBe(200);
-    const url=`/sportsession/Rugby`
-    const res = await agent.get(url)
-    const csrfToken = extractCsrfToken(res)
+    const url = `/sportsession/Rugby`;
+    const res = await agent.get(url);
+    const csrfToken = extractCsrfToken(res);
     const date_today = new Date();
-    const response = await agent.post('/sportsession').send({
-        name: 'Rugby',
-        date: date_today,
-        address: 'Parade Ground',
-        players: ["1","3","4"],//id of players since there maybe multiple people with same name
-        count: 4,
-        cancelled: false,
-       _csrf: csrfToken
-    })
-    expect(response.statusCode).toBe(302) 
-  })
+    const response = await agent.post("/sportsession").send({
+      name: "Rugby",
+      date: date_today,
+      address: "Parade Ground",
+      players: ["1", "3", "4"], //id of players since there maybe multiple people with same name
+      count: 4,
+      cancelled: false,
+      _csrf: csrfToken,
+    });
+    expect(response.statusCode).toBe(302);
+  });
   test("Sign out as Admin", async () => {
-    let res = await agent.get('/home')
-    expect(res.statusCode).toBe(200)
-    res = await agent.get('/signout')
-    expect(res.statusCode).toBe(302)
-    res = await agent.get('/home')
-    expect(res.statusCode).toBe(302)
-  })
+    let res = await agent.get("/home");
+    expect(res.statusCode).toBe(200);
+    res = await agent.get("/signout");
+    expect(res.statusCode).toBe(302);
+    res = await agent.get("/home");
+    expect(res.statusCode).toBe(302);
+  });
   test("Sign Up as Player", async () => {
     let res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
@@ -121,35 +121,35 @@ describe("Sports Scheduler", function () {
       password: "abcd",
       _csrf: csrfToken,
     });
-    console.log(res)
+    console.log(res);
     expect(res.statusCode).toBe(302);
-  })
-  test('Creating a session as Player', async () => {
-    const agent = request.agent(server)
-    await login(agent, 'srinivas@gmail.com', 'abcd')
+  });
+  test("Creating a session as Player", async () => {
+    const agent = request.agent(server);
+    await login(agent, "srinivas@gmail.com", "abcd");
     const res1 = await agent.get("/sport_main/1");
     expect(res1.statusCode).toBe(200);
-    const url=`/sportsession/Rugby`
-    const res = await agent.get(url)
-    const csrfToken = extractCsrfToken(res)
+    const url = `/sportsession/Rugby`;
+    const res = await agent.get(url);
+    const csrfToken = extractCsrfToken(res);
     const date_today = new Date();
-    const response = await agent.post('/sportsession').send({
-        name: 'Rugby',
-        date: date_today,
-        address: 'Parade Ground',
-        players: ["1","2","4"],//id of players since there maybe multiple people with same name
-        count: 4,
-        cancelled: false,
-       _csrf: csrfToken
-    })
-    expect(response.statusCode).toBe(302) 
-  })
+    const response = await agent.post("/sportsession").send({
+      name: "Rugby",
+      date: date_today,
+      address: "LB Stadium",
+      players: ["1", "2"], //id of players since there maybe multiple people with same name
+      count: 4,
+      cancelled: false,
+      _csrf: csrfToken,
+    });
+    expect(response.statusCode).toBe(302);
+  });
   test("Sign out as Player", async () => {
-    let res = await agent.get('/home')
-    expect(res.statusCode).toBe(200)
-    res = await agent.get('/signout')
-    expect(res.statusCode).toBe(302)
-    res = await agent.get('/home')
-    expect(res.statusCode).toBe(302)
-  })
+    let res = await agent.get("/home");
+    expect(res.statusCode).toBe(200);
+    res = await agent.get("/signout");
+    expect(res.statusCode).toBe(302);
+    res = await agent.get("/home");
+    expect(res.statusCode).toBe(302);
+  });
 });
