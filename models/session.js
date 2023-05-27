@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       date: DataTypes.DATE,
       address: DataTypes.STRING,
-      players: DataTypes.ARRAY(DataTypes.STRING),
+      players: DataTypes.ARRAY(DataTypes.INTEGER),
       count: DataTypes.INTEGER,
       cancelled: DataTypes.BOOLEAN,
       reason: DataTypes.STRING,

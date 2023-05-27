@@ -266,6 +266,9 @@ app.post(
       return response.redirect(url);
     }
     try {
+      const stringplayers= request.body.players
+      const intplayers = stringplayers.map(Number)
+      console.log(intplayers)
       const session = await Session.addSession({
         name: request.body.name,
         date: request.body.date,

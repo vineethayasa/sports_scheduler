@@ -22,7 +22,7 @@ module.exports = {
         allowNull: false,
       },
       players: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
         allowNull: false,
       },
       count: {
