@@ -85,7 +85,7 @@ describe("Sports Scheduler", function () {
       name: "Rugby",
       date: date_today,
       address: "Parade Ground",
-      players: ["1", "3", "4"], //id of players since there maybe multiple people with same name
+      players: [1, 3, 4], //id of players since there maybe multiple people with same name
       count: 4,
       cancelled: false,
       _csrf: csrfToken,
@@ -137,7 +137,7 @@ describe("Sports Scheduler", function () {
       name: "Rugby",
       date: date_today,
       address: "LB Stadium",
-      players: ["1", "2"], //id of players since there maybe multiple people with same name
+      players: [1, 2], //id of players since there maybe multiple people with same name
       count: 4,
       cancelled: false,
       _csrf: csrfToken,
