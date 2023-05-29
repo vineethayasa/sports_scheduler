@@ -61,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
         }
       );
     }
-    static removeSession(sportId, userId) {
+    static removeSessionbySport(sportId, userId) {
       return this.destroy({
         where: {
           sportId: sportId,

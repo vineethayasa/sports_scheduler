@@ -25,6 +25,18 @@ module.exports = (sequelize, DataTypes) => {
     static getAllUsers() {
       return this.findAll();
     }
+    static async changePassword(id, password) {
+      return await this.update(
+        {
+          password: password,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+    }
   }
   User.init(
     {
