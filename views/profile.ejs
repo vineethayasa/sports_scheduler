@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta content="<%= csrfToken %>" name="_csrf">
+    <link href="./css/styles.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <%- include("header.ejs") %> 
+    
+    <div class="flex items-center justify-center">
+       <div>
+          <h2 class="text-3xl font-bold text-center text-indigo-900 mb-6 mt-6">USER INFO</h2>
+          <form action="/profile" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="mb-5">
+              <label for="firstName" class="text-indigo-700">First Name:</label>
+              <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+                <%- currentuser.firstName %> 
+              </div>
+            </div>     
+            <div class="mb-5">
+                <label for="firstName" class="text-indigo-700">Last Name:</label>
+                <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+                  <%- currentuser.lastName %> 
+                </div>
+            </div>
+            <div class="mb-5">
+                <label for="firstName" class="text-indigo-700">Email:</label>
+                <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+                  <%- currentuser.email %> 
+                </div>
+            </div>  
+            <div class="mb-5">
+                <label for="firstName" class="text-indigo-700">Role:</label>
+                <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+                  <%- currentuser.role %> 
+                </div>
+            </div> 
+
+            <div class="mb-5">
+              <label for="password" class="text-indigo-700">Change Password ?</label>
+              <input type="password" name="oldpassword" placeholder="Enter old password" class="bg-gray-100 text-gray-900 rounded p-2 w-full mb-4">
+              <input type="password" name="newpassword" placeholder="Enter new password" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+            </div>
+            
+            <div class="flex justify-center">
+              <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">Update</button>
+            </div>
+          </form>
+          <div class="mt-4 text-red-600">
+              <% if(messages && messages.error && messages.error.length > 0)  { %>
+                  <% for(var i=0; i<messages.error.length; i++) { %>
+                          <li> <%= messages.error[i] %></li>
+                  <% } %>
+              <% } %>
+          </div>
+        </div>
+    </div>
+  </body>
+</html>
