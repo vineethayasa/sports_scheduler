@@ -15,7 +15,7 @@ const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
 
-const bcyrpt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const flash = require("connect-flash");
@@ -57,9 +57,11 @@ passport.use(
       password: "password",
     },
     (username, password, done) => {
+      console.log(User);
+      console.log("check here");
       User.findOne({ where: { email: username } })
         .then(async (user) => {
-          const result = await bcyrpt.compare(password, user.password);
+          const result = await bcrypt.compare(password, user.password);
           if (result) {
             return done(null, user);
           } else {
@@ -109,6 +111,49 @@ app.get("/signout", (request, response, next) => {
 });
 
 app.get(
+  "/profile",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const loggedinUser = request.user.id;
+    const currentuser = await User.getUser(loggedinUser);
+    response.render("profile", {
+      currentuser,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/profile",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    if (!request.body.oldpassword || !request.body.newpassword) {
+      request.flash("error", "Password cannot be empty");
+      return response.redirect("/profile");
+    }
+    const hashedPwd = await bcrypt.hash(request.body.newpassword, saltRounds);
+    if (
+      !(await bcrypt.compare(request.body.oldpassword, request.user.password))
+    ) {
+      request.flash("error", "Enter correct old password");
+      return response.redirect("/profile");
+    }
+    if (await bcrypt.compare(request.body.newpassword, request.user.password)) {
+      request.flash("error", "Password cannot be same");
+      return response.redirect("/profile");
+    }
+    try {
+      await User.changePassword(request.user.id, hashedPwd);
+      response.redirect("/home");
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect("/profile");
+    }
+  }
+);
+
+app.get(
   "/home",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
@@ -153,7 +198,7 @@ app.post("/users", async (request, response) => {
     request.flash("error", "Role cannot be empty");
     return response.redirect("/signup");
   }
-  const hashedPwd = await bcyrpt.hash(request.body.password, saltRounds);
+  const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
   console.log(hashedPwd);
   try {
     const user = await User.addUser({
@@ -182,6 +227,39 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     response.render("new_sport", { csrfToken: request.csrfToken() });
+  }
+);
+app.get(
+  "/session_main/:session_id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const session_id = request.params.session_id;
+    const session_details = await Session.getSessionById(session_id);
+    console.log(session_details);
+    const userid = request.user.id;
+    const session_name = session_details.name;
+    const session_date = session_details.date.toLocaleDateString();
+    const session_time = session_details.date.toLocaleTimeString();
+    const session_address = session_details.address;
+    const session_players_id = session_details.players;
+    const session_creator = session_details.userId;
+
+    const session_players = await Promise.all(
+      session_players_id.map(async (id) => await User.getUser(id))
+    );
+    //console.log(session_players)
+
+    response.render("session_main", {
+      userid,
+      session_id,
+      session_name,
+      session_date,
+      session_time,
+      session_address,
+      session_players,
+      session_creator,
+      csrfToken: request.csrfToken(),
+    });
   }
 );
 app.get(
@@ -239,6 +317,47 @@ app.post(
     }
   }
 );
+//get edit sport
+app.get(
+  "/editsport/:name",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sport_name = request.params.name;
+    response.render("editsport", {
+      sport_name,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+//post edit sport
+app.post(
+  "/editsport/:name",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    console.log(request.params.name);
+
+    if (!request.body.sport_name) {
+      request.flash("error", "Sport name cannot be empty");
+      return response.redirect(`/editsport/${request.params.name}`);
+    }
+    if (request.body.sport_name === request.params.name) {
+      request.flash("error", "Sport name cannot be same");
+      return response.redirect(`/editsport/${request.params.name}`);
+    }
+    try {
+      const sport = await Sport.getSportByName(request.params.name);
+      await Session.renameSportinSession(sport.id, request.body.sport_name);
+      await Sport.renameSport(sport.id, request.body.sport_name);
+      const url = `/sport_main/${sport.id}`;
+      response.redirect(url);
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect(`/editsport/${request.params.name}`);
+    }
+  }
+);
 
 app.post(
   "/sportsession",
@@ -266,9 +385,9 @@ app.post(
       return response.redirect(url);
     }
     try {
-      const stringplayers= request.body.players
-      const intplayers = stringplayers.map(Number)
-      console.log(intplayers)
+      const stringplayers = request.body.players;
+      const intplayers = stringplayers.map(Number);
+      console.log(intplayers);
       const session = await Session.addSession({
         name: request.body.name,
         date: request.body.date,
@@ -281,8 +400,9 @@ app.post(
       });
       console.log(url);
       console.log(session);
-      const someid = sport.id;
-      const url2 = `/sport_main/${someid}`;
+
+      const someid = session.id;
+      const url2 = `/session_main/${someid}`;
       response.redirect(url2);
     } catch (error) {
       console.log(error);
@@ -291,6 +411,100 @@ app.post(
     }
   }
 );
+
+// delete sport
+app.get(
+  "/deletesport/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      await Session.removeSessionbySport(request.params.id, request.user.id);
+      await Sport.remove(request.params.id, request.user.id);
+      response.redirect("/home");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
+// join session
+app.get(
+  "/joinsession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const session = await Session.getSessionById(request.params.id);
+      if (session.date < new Date()) {
+        request.flash("error", `Session completed`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else if (session.cancelled) {
+        request.flash("error", `Session cancelled`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else if (session.players.includes(request.user.id)) {
+        request.flash("error", `Already joined the Session`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else if (session.count < 1) {
+        request.flash("error", `All slots are booked`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else {
+        await Session.joinSession(request.user.id, request.params.id);
+        response.redirect(`/session_main/${request.params.id}`);
+      }
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect(`/session_main/${request.params.id}`);
+    }
+  }
+);
+
+//leave session
+app.get(
+  "/leavesession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const session = await Session.getSessionById(request.params.id);
+      if (session.date < new Date()) {
+        request.flash("error", `Session completed`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else if (session.cancelled) {
+        request.flash("error", `Session cancelled`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else if (!session.players.includes(request.user.id)) {
+        request.flash("error", `Did not join session`);
+        response.redirect(`/session_main/${request.params.id}`);
+      } else {
+        await Session.leaveSession(request.user.id, request.params.id);
+        response.redirect(`/session_main/${request.params.id}`);
+      }
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect(`/session_main/${request.params.id}`);
+    }
+  }
+);
+
+app.get(
+  "/removeplayer/:playerid/:sessionid",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    try {
+      const session = await Session.getSessionById(request.params.sessionid);
+      await Session.leaveSession(
+        request.params.playerid,
+        request.params.sessionid
+      );
+      response.redirect(`/session_main/${request.params.sessionid}`);
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect(`/session_main/${request.params.sessionid}`);
+    }
+  }
+);
+
 app.get("/allsessions", async (request, response) => {
   try {
     const sessions = await Session.findAll();
@@ -300,4 +514,25 @@ app.get("/allsessions", async (request, response) => {
     return response.status(422).json(error);
   }
 });
+
+app.get("/allusers", async (request, response) => {
+  try {
+    const users = await User.findAll();
+    return response.send(users);
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+
+app.get("/allsports", async (request, response) => {
+  try {
+    const sports = await Sport.findAll();
+    return response.send(sports);
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
+
 module.exports = app;
