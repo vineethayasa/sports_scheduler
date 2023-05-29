@@ -1,0 +1,19 @@
+<div class="mt-6">
+    <% for (var i = 0; i < session_players.length; i++) { %>
+      <button class="w-40 bg-indigo-400 text-indigo-100 font-bold rounded-lg py-2 px-4 mb-4 mr-4">
+        <span class="flex items-center justify-between">
+            <span class="mr-2"><%= session_players[i].firstName %></span>
+            
+            <%if (session_creator === userid) { %>
+                <a href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </a>
+            <% } %>
+
+        </span>      
+      </button>                
+    <% } %>
+  </div>
+  
