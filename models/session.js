@@ -50,6 +50,25 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+    static async getCancelledSessions(sportId) {
+      return await this.findAll({
+        where: {
+          cancelled: true,
+          sportId: sportId,
+        },
+      });
+    }
+    static async getPreviousSessions(sportId) {
+      const today = new Date();
+      return await this.findAll({
+        where: {
+          sportId: sportId,
+          date: {
+            [Op.lt]: today,
+          },
+        },
+      });
+    }
     static async getOthersSessions(userId, sportId) {
       const today = new Date();
       return await this.findAll({

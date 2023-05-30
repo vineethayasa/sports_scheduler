@@ -13,30 +13,32 @@
       <div class="col-start-3 col-span-3">
         <div class="flex justify-between items-center">
           <h1 class="text-3xl mb-4 font-bold mt-6 text-indigo-700"><%= session_name %> Session #<%= session_id %></h1>
-          <%if (session_creator === userid) { %>
+          <%if (session_creator === userid && flag==0) { %>
             <span>
               <a href="/editsession/<%= session_id %>" class="mr-10 underline text-indigo-700 text-xl">Edit</a>
-              <a href="/cancelsession/<%= session_id %>" class="underline text-indigo-700 text-xl">Cancel</a>
+              <a href="/cancelsession/<%= session_id %>/<%= sportid %>" class="underline text-indigo-700 text-xl">Cancel</a>
             </span>
           <% } %>
         </div>
 
         <p class="text-xl mb-6">This session is scheduled for <%= session_date %> <%= session_time %> at <%= session_address %></p>
         <h1 class="text-2xl font-bold text-indigo-700">Players</h1>
-        <%- include("players.ejs") %> 
-        
-        <div style="display: flex;">
-          <a id="sessionLink" class="text-indigo-700 underline text-xl mr-10" href="/joinsession/<%= session_id %>" >Join Session</a>
-          <a class="text-indigo-700 underline text-xl" href="/leavesession/<%= session_id %>" >Leave Session</a>
-        </div>
+        <%- include("players.ejs",{flag:flag}) %> 
 
-        <div class="mt-4 text-red-600 text-xl">
-          <% if(messages && messages.error && messages.error.length > 0)  { %>
-            <% for(var i=0; i<messages.error.length; i++) { %>
-                    <li> <%= messages.error[i] %></li>
-            <% } %>
-          <% } %>
-        </div>
+        <%if (flag==0) { %>
+          <div style="display: flex;">
+            <a id="sessionLink" class="text-indigo-700 underline text-xl mr-10" href="/joinsession/<%= session_id %>" >Join Session</a>
+            <a class="text-indigo-700 underline text-xl" href="/leavesession/<%= session_id %>" >Leave Session</a>
+          </div>
+        <% } %>
+
+        <%if (flag==2) { %>
+          <h1 class="text-xl font-bold text-indigo-700 mt-2 mb-2">REASON FOR CANCELLATION :</h1>
+          <p class="text-l  text-indigo-900 "><%= session_reason %></p>
+        <% } %>
+          
+
+
       </div>
       
     </div>

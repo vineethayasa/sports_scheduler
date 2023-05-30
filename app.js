@@ -236,7 +236,7 @@ app.get(
   }
 );
 app.get(
-  "/session_main/:session_id",
+  "/session_main/:session_id/:flag",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const session_id = request.params.session_id;
@@ -249,6 +249,9 @@ app.get(
     const session_address = session_details.address;
     const session_players_id = session_details.players;
     const session_creator = session_details.userId;
+    const session_reason = session_details.reason;
+    const sportid = session_details.sportId;
+    const flag = request.params.flag;
 
     const session_players = await Promise.all(
       session_players_id.map(async (id) => await User.getUser(id))
@@ -264,6 +267,9 @@ app.get(
       session_address,
       session_players,
       session_creator,
+      session_reason,
+      sportid,
+      flag,
       csrfToken: request.csrfToken(),
     });
   }
@@ -277,6 +283,21 @@ app.get(
     response.render("sportsessions", {
       data,
       current_sport_name,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+app.get(
+  "/previoussession/:sportid",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sport = await Sport.getSportById(request.params.sportid) 
+    const userid = request.user.id
+    const previoussessions = await Session.getPreviousSessions(request.params.sportid)
+    response.render("previoussession", {
+      sport,
+      userid,
+      previoussessions,
       csrfToken: request.csrfToken(),
     });
   }
@@ -300,12 +321,16 @@ app.get(
       request.user.id,
       request.params.id
     );
+    const cancelsessions = await Session.getCancelledSessions(
+      request.params.id
+    );
 
     response.render("sport_main", {
       current_sport,
       usersessions,
       othersessions,
       joinedsessions,
+      cancelsessions,
       userid,
       csrfToken: request.csrfToken(),
     });
@@ -442,7 +467,7 @@ app.post(
       console.log(session);
 
       const someid = session.id;
-      const url2 = `/session_main/${someid}`;
+      const url2 = `/session_main/${someid}/0`;
       response.redirect(url2);
     } catch (error) {
       console.log(error);
@@ -499,7 +524,7 @@ app.post(
         request.params.id,
         request.body
       );
-      response.redirect(`/session_main/${request.params.id}`);
+      response.redirect(`/session_main/${request.params.id}/0`);
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
@@ -510,12 +535,14 @@ app.post(
 
 //get cancel session
 app.get(
-  "/cancelsession/:id",
+  "/cancelsession/:id/:sportid",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const session_id = request.params.id;
+    const sport_id = request.params.sportid;
     response.render("cancelsession", {
       session_id,
+      sport_id,
       csrfToken: request.csrfToken(),
     });
   }
@@ -523,7 +550,7 @@ app.get(
 
 //post cancel session
 app.post(
-  "/cancelsession/:id",
+  "/cancelsession/:id/:sportid",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     if (!request.body.reason) {
@@ -535,7 +562,7 @@ app.post(
         request.params.id,
         request.body.reason
       );
-      response.redirect(`/session_main/${request.params.id}`);
+      response.redirect(`/sport_main/${request.params.sportid}`);
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
@@ -569,24 +596,24 @@ app.get(
       const session = await Session.getSessionById(request.params.id);
       if (session.date < new Date()) {
         request.flash("error", `Session completed`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else if (session.cancelled) {
         request.flash("error", `Session cancelled`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else if (session.players.includes(request.user.id)) {
         request.flash("error", `Already joined the Session`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else if (session.count < 1) {
         request.flash("error", `All slots are booked`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else {
         await Session.joinSession(request.user.id, request.params.id);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       }
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
-      response.redirect(`/session_main/${request.params.id}`);
+      response.redirect(`/session_main/${request.params.id}/0`);
     }
   }
 );
@@ -600,21 +627,21 @@ app.get(
       const session = await Session.getSessionById(request.params.id);
       if (session.date < new Date()) {
         request.flash("error", `Session completed`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else if (session.cancelled) {
         request.flash("error", `Session cancelled`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else if (!session.players.includes(request.user.id)) {
         request.flash("error", `Did not join session`);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       } else {
         await Session.leaveSession(request.user.id, request.params.id);
-        response.redirect(`/session_main/${request.params.id}`);
+        response.redirect(`/session_main/${request.params.id}/0`);
       }
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
-      response.redirect(`/session_main/${request.params.id}`);
+      response.redirect(`/session_main/${request.params.id}/0`);
     }
   }
 );
@@ -629,11 +656,11 @@ app.get(
         request.params.playerid,
         request.params.sessionid
       );
-      response.redirect(`/session_main/${request.params.sessionid}`);
+      response.redirect(`/session_main/${request.params.sessionid}/0`);
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
-      response.redirect(`/session_main/${request.params.sessionid}`);
+      response.redirect(`/session_main/${request.params.sessionid}/0`);
     }
   }
 );

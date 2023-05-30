@@ -1,5 +1,5 @@
 "use strict";
-const { Model,Op } = require("sequelize");
+const { Model, Op } = require("sequelize");
 const Session = require("./session");
 const User = require("./user");
 module.exports = (sequelize, DataTypes) => {
@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
-    
+
     static async getOthersSports(userId) {
       return await this.findAll({
         where: {
@@ -41,8 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
-    
-    
+
     static async getSportById(id) {
       return this.findByPk(id);
     }

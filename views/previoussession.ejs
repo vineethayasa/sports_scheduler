@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>  
+  <body>
+    <%- include("header.ejs") %> 
+    <div class="grid grid-cols-7 gap-6 px-4">
+      <div class="col-start-3 col-span-3">
+        <div class="flex justify-between items-center">
+          <h1 class="text-3xl mb-4 font-bold mt-6 text-indigo-700">Previous <%= sport.sport_name %> Sessions</h1>
+        </div>        
+        <%- include('sessionslist', {title:"",data: previoussessions,sportid:sport.id,flag:1}) %>
+        </div>
+      </div>
+      
+    </div>
+  </body>
+</html>
