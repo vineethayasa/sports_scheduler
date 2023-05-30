@@ -23,8 +23,16 @@
           <%} else { %>
             <h1 class="text-2xl italic">Player Actions</h1>
           <% } %>
-          <br>          
-          <%- include('sportslist.ejs', {data: sportsnames,currentuser:currentuser}) %>
+          <br>         
+
+          <% if(usersports.length < 1 && othersports.length < 1){ %>
+            <p class="text-xl font-bold">There are no sports available for scheduling a session</p>
+          <% } else{ %>  
+            <%- include('sportslist.ejs', {title:"Created by you",data: usersports,currentuser:currentuser}) %>
+            <%- include('sportslist.ejs', {title:"Here are the sports available",data: othersports,currentuser:currentuser}) %>
+         <% } %>
+
+            
         </div>
     </div>
   </body>

@@ -159,10 +159,12 @@ app.get(
   async (request, response) => {
     const loggedinUser = request.user.id;
     const currentuser = await User.getUser(loggedinUser);
-    const sportsnames = await Sport.getSports();
+    const usersports = await Sport.getUsersSports(loggedinUser);
+    const othersports = await Sport.getOthersSports(loggedinUser);
     response.render("home", {
       currentuser,
-      sportsnames,
+      usersports,
+      othersports,
       csrfToken: request.csrfToken(),
     });
   }
