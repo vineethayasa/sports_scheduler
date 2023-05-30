@@ -16,7 +16,7 @@
           <%if (session_creator === userid) { %>
             <span>
               <a href="/editsession/<%= session_id %>" class="mr-10 underline text-indigo-700 text-xl">Edit</a>
-              <a href="#" class="underline text-indigo-700 text-xl">Cancel</a>
+              <a href="/cancelsession/<%= session_id %>" class="underline text-indigo-700 text-xl">Cancel</a>
             </span>
           <% } %>
         </div>

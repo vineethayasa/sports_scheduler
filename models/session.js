@@ -52,6 +52,19 @@ module.exports = (sequelize, DataTypes) => {
         }
       );
     }
+    static cancelSession(id, reason) {
+      return this.update(
+        {
+          cancelled:true,
+          reason:reason
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+    }
     static getSessions() {
       return this.findAll();
     }
@@ -65,8 +78,7 @@ module.exports = (sequelize, DataTypes) => {
       return getSport;
     }
     static async renameSportinSession(id, sport_name) {
-      return await this.update(
-        {
+      return await this.update({
           name: sport_name,
         },
         {

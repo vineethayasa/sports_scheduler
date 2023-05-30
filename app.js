@@ -468,6 +468,43 @@ app.post(
   }
 );
 
+//get cancel session
+app.get(
+  "/cancelsession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const session_id = request.params.id;
+    response.render("cancelsession", {
+      session_id,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+//post cancel session
+app.post(
+  "/cancelsession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    if (!request.body.reason) {
+      request.flash("error", "Enter valid reason");
+      return response.redirect(`/cancelsession/${request.params.id}`);
+    }
+    try {
+      const session = await Session.cancelSession(
+        request.params.id,
+        request.body.reason,
+      );
+      response.redirect(`/session_main/${request.params.id}`);
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect(`/cancelsession/${request.params.id}`);
+    }
+  }
+);
+
+
 // delete sport
 app.get(
   "/deletesport/:id",

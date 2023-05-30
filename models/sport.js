@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
       // await Session.removeSessionbySport(id, userId);
       return this.destroy({
         where: {
-          id
+          id,
         },
       });
     }
