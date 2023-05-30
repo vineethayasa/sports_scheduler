@@ -1,6 +1,7 @@
 "use strict";
 const { Model } = require("sequelize");
 const Session = require("./session");
+const User = require("./user");
 module.exports = (sequelize, DataTypes) => {
   class Sport extends Model {
     /**
@@ -32,12 +33,12 @@ module.exports = (sequelize, DataTypes) => {
       });
       return getSport;
     }
-    static async remove(id, userId) {
+    static async remove(id) {
+      // await User.removeSport(id);
       // await Session.removeSessionbySport(id, userId);
       return this.destroy({
         where: {
-          id,
-          userId,
+          id
         },
       });
     }

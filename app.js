@@ -419,8 +419,8 @@ app.get(
   async (request, response) => {
     try {
       await User.removeSport(request.params.id);
-      await Session.removeSessionbySport(request.params.id, request.user.id);
-      await Sport.remove(request.params.id, request.user.id);
+      await Session.removeSessionbySport(request.params.id);
+      await Sport.remove(request.params.id);
       response.redirect("/home");
     } catch (error) {
       console.log(error);

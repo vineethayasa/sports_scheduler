@@ -61,11 +61,10 @@ module.exports = (sequelize, DataTypes) => {
         }
       );
     }
-    static removeSessionbySport(sportId, userId) {
+    static removeSessionbySport(sportId) {
       return this.destroy({
         where: {
-          sportId: sportId,
-          userId: userId,
+          sportId: sportId
         },
       });
     }
