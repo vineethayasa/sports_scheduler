@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       return getSport;
     }
     static async remove(id, userId) {
+      // await Session.removeSessionbySport(id, userId);
       return this.destroy({
         where: {
           id,

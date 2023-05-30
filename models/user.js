@@ -37,6 +37,15 @@ module.exports = (sequelize, DataTypes) => {
         }
       );
     }
+    static async removeSport(sportId) {
+      const sport = await this.sequelize.models.Sport.findByPk(sportId);
+      if (sport) {
+        await sport.update({ userId: null });
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
   User.init(
     {

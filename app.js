@@ -418,6 +418,7 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
+      await User.removeSport(request.params.id);
       await Session.removeSessionbySport(request.params.id, request.user.id);
       await Sport.remove(request.params.id, request.user.id);
       response.redirect("/home");
