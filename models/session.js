@@ -1,5 +1,5 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Session extends Model {
     /**
@@ -37,6 +37,55 @@ module.exports = (sequelize, DataTypes) => {
         userId,
       });
     }
+    static async getUsersSessions(userId, sportId) {
+      const today = new Date();
+      return await this.findAll({
+        where: {
+          userId: userId,
+          date: {
+            [Op.gt]: today,
+          },
+          cancelled: false,
+          sportId: sportId,
+        },
+      });
+    }
+    static async getOthersSessions(userId, sportId) {
+      const today = new Date();
+      return await this.findAll({
+        where: {
+          userId: {
+            [Op.not]: userId,
+          },
+          date: {
+            [Op.gt]: today,
+          },
+          [Op.not]: {
+            players: {
+              [Op.contains]: [userId],
+            },
+          },
+          cancelled: false,
+          sportId: sportId,
+        },
+      });
+    }
+    static async getJoinedSessions(userId, sportId) {
+      const today = new Date();
+      return await this.findAll({
+        where: {
+          sportId: sportId,
+          players: {
+            [Op.contains]: [userId],
+          },
+          date: {
+            [Op.gt]: today,
+          },
+          cancelled: false,
+        },
+      });
+    }
+
     static updateSession(id, body) {
       return this.update(
         {
@@ -55,8 +104,8 @@ module.exports = (sequelize, DataTypes) => {
     static cancelSession(id, reason) {
       return this.update(
         {
-          cancelled:true,
-          reason:reason
+          cancelled: true,
+          reason: reason,
         },
         {
           where: {
@@ -78,7 +127,8 @@ module.exports = (sequelize, DataTypes) => {
       return getSport;
     }
     static async renameSportinSession(id, sport_name) {
-      return await this.update({
+      return await this.update(
+        {
           name: sport_name,
         },
         {

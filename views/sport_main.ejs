@@ -10,8 +10,8 @@
   </head>
   <body>
     <%- include("header.ejs") %>
-    <div class="grid grid-cols-6">
-      <div class="col-start-3 col-span-2">
+    <div class="grid grid-cols-7 gap-6 px-4">
+      <div class="col-start-3 col-span-3">
         <div class="flex justify-between items-center">
           <h6 class="py-4 text-3xl font-bold mb-4"><%= current_sport.sport_name %></h6>
           <% if (current_sport.userId == userid) { %>
@@ -23,9 +23,16 @@
         </div>
         <h1 class="text-2xl mb-2 font-bold">Sessions</h1>
 
-        <%- include('sessionslist', {data: sessionDetails, userid, sportid:current_sport.id}) %>
+        <% if(usersessions.length < 1 && othersessions.length < 1){ %>
+          <p class="text-xl font-bold text-indigo-700 mt-2 mb-2">There are no sessions available to join right now. Create one?</p>
+        <% } else{ %>  
+          <%- include('sessionslist', {title:"Created by you",data: usersessions, userid, sportid:current_sport.id}) %>
+          <%- include('sessionslist', {title:"Other Available Sessions",data: othersessions, userid, sportid:current_sport.id}) %>
+       <% } %>
 
-        <div style="display: flex;">
+       <%- include('sessionslist', {title:"Joined Sessions",data: joinedsessions, userid, sportid:current_sport.id}) %>
+
+        <div style="display: flex;" class="mb-8">
           <a href="/sportsession/<%= current_sport.sport_name %>" class="underline text-indigo-700 text-xl mr-20">Create a new session</a>
           <a href="/previoussession" class="underline text-indigo-700 text-xl">View previous sessions</a>
         </div>

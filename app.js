@@ -196,6 +196,10 @@ app.post("/users", async (request, response) => {
     request.flash("error", "Password cannot be empty");
     return response.redirect("/signup");
   }
+  if (request.body.password.length < 8) {
+    request.flash("error", "Password should be atleast 8 characters long");
+    return response.redirect("/signup");
+  }
   if (!request.body.role) {
     request.flash("error", "Role cannot be empty");
     return response.redirect("/signup");
@@ -283,12 +287,25 @@ app.get(
   async (request, response) => {
     console.log(request.params.id);
     const current_sport = await Sport.getSportById(request.params.id);
-    console.log(current_sport.sport_name);
-    const sessionDetails = await Session.getSessions();
     const userid = request.user.id;
+    const usersessions = await Session.getUsersSessions(
+      request.user.id,
+      request.params.id
+    );
+    const othersessions = await Session.getOthersSessions(
+      request.user.id,
+      request.params.id
+    );
+    const joinedsessions = await Session.getJoinedSessions(
+      request.user.id,
+      request.params.id
+    );
+
     response.render("sport_main", {
       current_sport,
-      sessionDetails,
+      usersessions,
+      othersessions,
+      joinedsessions,
       userid,
       csrfToken: request.csrfToken(),
     });
@@ -368,8 +385,29 @@ app.post(
     const sport = await Sport.getSportByName(request.body.name);
     const somename = request.body.name;
     const url = `/sportsession/${somename}`;
+    const today = new Date();
+    const session_d = new Date(request.body.date);
+
+    const today_date = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const session_date = new Date(
+      session_d.getFullYear(),
+      session_d.getMonth(),
+      session_d.getDate()
+    );
+
+    console.log(today_date);
+    console.log(session_date);
+
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
+      return response.redirect(url);
+    }
+    if (session_date < today_date) {
+      request.flash("error", "You cannot enter a past date");
       return response.redirect(url);
     }
     if (!request.body.address) {
@@ -495,7 +533,7 @@ app.post(
     try {
       const session = await Session.cancelSession(
         request.params.id,
-        request.body.reason,
+        request.body.reason
       );
       response.redirect(`/session_main/${request.params.id}`);
     } catch (error) {
@@ -505,7 +543,6 @@ app.post(
     }
   }
 );
-
 
 // delete sport
 app.get(
