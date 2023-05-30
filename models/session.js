@@ -37,6 +37,21 @@ module.exports = (sequelize, DataTypes) => {
         userId,
       });
     }
+    static updateSession(id, body) {
+      return this.update(
+        {
+          date: body.date,
+          address: body.address,
+          players: body.players,
+          count: body.count,
+        },
+        {
+          where: {
+            id: id,
+          },
+        }
+      );
+    }
     static getSessions() {
       return this.findAll();
     }
@@ -64,7 +79,7 @@ module.exports = (sequelize, DataTypes) => {
     static removeSessionbySport(sportId) {
       return this.destroy({
         where: {
-          sportId: sportId
+          sportId: sportId,
         },
       });
     }

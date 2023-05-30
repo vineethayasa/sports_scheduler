@@ -412,6 +412,62 @@ app.post(
   }
 );
 
+//get edit session
+app.get(
+  "/editsession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const session_id = request.params.id;
+    const session_details = await Session.getSessionById(session_id);
+    const data = await User.getAllUsers();
+    const current_sport_name = request.params.sport_name;
+    response.render("editsession", {
+      session_id,
+      session_details,
+      data,
+      current_sport_name,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+//post edit session
+app.post(
+  "/editsession/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    if (!request.body.date) {
+      request.flash("error", "Date cannot be empty");
+      return response.redirect(`/editsession/${request.params.id}`);
+    }
+    if (!request.body.address) {
+      request.flash("error", "Address cannot be empty");
+      return response.redirect(`/editsession/${request.params.id}`);
+    }
+    console.log(request.body.players);
+
+    if (!request.body.players || request.body.players.length < 2) {
+      request.flash("error", " No. of players should be atleast 2");
+      return response.redirect(`/editsession/${request.params.id}`);
+    }
+    if (!request.body.count) {
+      request.flash("error", "Enter 0 if no extra players needed");
+      return response.redirect(`/editsession/${request.params.id}`);
+    }
+    try {
+      const session = await Session.updateSession(
+        request.params.id,
+        request.body
+      );
+      response.redirect(`/session_main/${request.params.id}`);
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect(`/editsession/${request.params.id}`);
+    }
+  }
+);
+
 // delete sport
 app.get(
   "/deletesport/:id",
