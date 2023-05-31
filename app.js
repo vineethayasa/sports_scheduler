@@ -275,14 +275,16 @@ app.get(
   }
 );
 app.get(
-  "/sportsession/:sport_name",
+  "/sportsession/:sport_name/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const data = await User.getAllUsers();
     const current_sport_name = request.params.sport_name;
+    const current_sport_id = request.params.id;
     response.render("sportsessions", {
       data,
       current_sport_name,
+      current_sport_id,
       csrfToken: request.csrfToken(),
     });
   }
@@ -291,9 +293,11 @@ app.get(
   "/previoussession/:sportid",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const sport = await Sport.getSportById(request.params.sportid) 
-    const userid = request.user.id
-    const previoussessions = await Session.getPreviousSessions(request.params.sportid)
+    const sport = await Sport.getSportById(request.params.sportid);
+    const userid = request.user.id;
+    const previoussessions = await Session.getPreviousSessions(
+      request.params.sportid
+    );
     response.render("previoussession", {
       sport,
       userid,
@@ -363,12 +367,14 @@ app.post(
 );
 //get edit sport
 app.get(
-  "/editsport/:name",
+  "/editsport/:name/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const sport_name = request.params.name;
+    const sport_id = request.params.id;
     response.render("editsport", {
       sport_name,
+      sport_id,
       csrfToken: request.csrfToken(),
     });
   }
@@ -479,18 +485,18 @@ app.post(
 
 //get edit session
 app.get(
-  "/editsession/:id",
+  "/editsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const session_id = request.params.id;
-    const session_details = await Session.getSessionById(session_id);
+    const sport_id = request.params.sportid;
+    const sport_name = request.params.name;
     const data = await User.getAllUsers();
-    const current_sport_name = request.params.sport_name;
     response.render("editsession", {
       session_id,
-      session_details,
+      sport_id,
+      sport_name,
       data,
-      current_sport_name,
       csrfToken: request.csrfToken(),
     });
   }
@@ -535,14 +541,16 @@ app.post(
 
 //get cancel session
 app.get(
-  "/cancelsession/:id/:sportid",
+  "/cancelsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const session_id = request.params.id;
     const sport_id = request.params.sportid;
+    const sport_name = request.params.name;
     response.render("cancelsession", {
       session_id,
       sport_id,
+      sport_name,
       csrfToken: request.csrfToken(),
     });
   }
