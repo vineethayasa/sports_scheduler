@@ -84,6 +84,9 @@ module.exports = (sequelize, DataTypes) => {
               [Op.contains]: [userId],
             },
           },
+          count: {
+            [Op.gt]: 0,
+          },
           cancelled: false,
           sportId: sportId,
         },
