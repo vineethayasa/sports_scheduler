@@ -19,10 +19,14 @@
       <div class="col-start-3 col-span-3">
         <div class="flex justify-between items-center">
           <h1 class="text-3xl mb-4 font-bold mt-6 text-indigo-700">Previous <%= sport.sport_name %> Sessions</h1>
+        </div>
+        <% if(previoussessions.length < 1){ %>
+          <p class="text-xl font-bold mt-2 mb-2">There are no previous sessions</p>
+        <% } else{ %>  
         </div>        
         <%- include('sessionslist', {title:"",data: previoussessions,sportid:sport.id,flag:1}) %>
         </div>
-      </div>
+       <% } %>
       
     </div>
   </body>

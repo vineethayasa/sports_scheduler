@@ -256,7 +256,6 @@ app.get(
     const session_players = await Promise.all(
       session_players_id.map(async (id) => await User.getUser(id))
     );
-    //console.log(session_players)
 
     response.render("session_main", {
       userid,
@@ -659,15 +658,13 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
-      const session = await Session.getSessionById(request.params.sessionid);
-      await Session.leaveSession(
-        request.params.playerid,
-        request.params.sessionid
-      );
+      const sessionid = request.params.sessionid;
+      const playerid = parseInt(request.params.playerid, 10);
+      await Session.leaveSession(playerid, sessionid);
       response.redirect(`/session_main/${request.params.sessionid}/0`);
     } catch (error) {
       console.log(error);
-      request.flash("error", error.errors[0].message);
+      request.flash("error", "deletion unsucessfull");
       response.redirect(`/session_main/${request.params.sessionid}/0`);
     }
   }
