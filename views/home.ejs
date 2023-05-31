@@ -25,6 +25,8 @@
           <% } %>
           <br>         
 
+          <%- include('sessionslist', {title:"Upcoming Sessions",data: upcomingsessions,flag:0}) %>
+
           <% if(usersports.length < 1 && othersports.length < 1){ %>
             <p class="text-xl font-bold">There are no sports available for scheduling a session</p>
           <% } else{ %>  

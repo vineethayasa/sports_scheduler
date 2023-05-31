@@ -107,6 +107,20 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
+    static async getUpcomingSessions(userId) {
+      const today = new Date();
+      return await this.findAll({
+        where: {
+          players: {
+            [Op.contains]: [userId],
+          },
+          date: {
+            [Op.gt]: today,
+          },
+          cancelled: false,
+        },
+      });
+    }
 
     static updateSession(id, body) {
       return this.update(

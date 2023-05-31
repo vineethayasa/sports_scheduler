@@ -1,9 +1,9 @@
 <div class="mt-5">
     <% if (data.length > 0) { %>
         <h1 class="text-2xl text-indigo-700 font-bold mb-4"><%= title %></h1>
-        <div class="flex">
-            <% for (var i =0; i <data.length;  i++ ) { %>
-                <a href="/session_main/<%= data[i].id %>/<%= flag %>" class="Session-Item flex flex-col justify-center items-center py-2 px-4 my-2 mx-2 bg-gray-200">
+        <div class="flex flex-wrap -mx-2">
+            <% for (var i = 0; i < data.length; i++) { %>
+                <a href="/session_main/<%= data[i].id %>/<%= flag %>" class="flex flex-col justify-center items-center py-2 px-4 my-2 mx-2 bg-gray-200 rounded-lg">
                     <span class="text-xl font-bold">Session # <%= data[i].id %></span>
                     <span class="text-sm"><%= new Date(data[i].date).toLocaleDateString() %></span>
                     <span class="text-sm"><%= new Date(data[i].date).toLocaleTimeString() %></span>
@@ -11,5 +11,5 @@
                 </a>                 
             <% } %>
         </div>
-    <%} %>    
+    <% } %>    
 </div>

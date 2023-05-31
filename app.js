@@ -161,10 +161,12 @@ app.get(
     const currentuser = await User.getUser(loggedinUser);
     const usersports = await Sport.getUsersSports(loggedinUser);
     const othersports = await Sport.getOthersSports(loggedinUser);
+    const upcomingsessions = await Session.getUpcomingSessions(loggedinUser);
     response.render("home", {
       currentuser,
       usersports,
       othersports,
+      upcomingsessions,
       csrfToken: request.csrfToken(),
     });
   }
