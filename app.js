@@ -57,8 +57,6 @@ passport.use(
       password: "password",
     },
     (username, password, done) => {
-      console.log(User);
-      console.log("check here");
       User.findOne({ where: { email: username } })
         .then(async (user) => {
           const result = await bcrypt.compare(password, user.password);
@@ -207,7 +205,6 @@ app.post("/users", async (request, response) => {
     return response.redirect("/signup");
   }
   const hashedPwd = await bcrypt.hash(request.body.password, saltRounds);
-  console.log(hashedPwd);
   try {
     const user = await User.addUser({
       firstName: request.body.firstName,
@@ -243,7 +240,6 @@ app.get(
   async (request, response) => {
     const session_id = request.params.session_id;
     const session_details = await Session.getSessionById(session_id);
-    console.log(session_details);
     const userid = request.user.id;
     const session_name = session_details.name;
     const session_date = session_details.date.toLocaleDateString();
@@ -311,7 +307,6 @@ app.get(
   "/sport_main/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    console.log(request.params.id);
     const current_sport = await Sport.getSportById(request.params.id);
     const userid = request.user.id;
     const usersessions = await Session.getUsersSessions(
@@ -355,8 +350,6 @@ app.post(
         sport_name: request.body.sport_name,
         userId: request.user.id,
       });
-      console.log(sport.sport_name);
-      console.log(sport);
       const url = `/sport_main/${sport.id}`;
       response.redirect(url);
     } catch (error) {
@@ -386,7 +379,6 @@ app.post(
   "/editsport/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    console.log(request.params.name);
 
     if (!request.body.sport_name) {
       request.flash("error", "Sport name cannot be empty");
@@ -431,9 +423,6 @@ app.post(
       session_d.getDate()
     );
 
-    console.log(today_date);
-    console.log(session_date);
-
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
       return response.redirect(url);
@@ -446,7 +435,6 @@ app.post(
       request.flash("error", "Address cannot be empty");
       return response.redirect(url);
     }
-    console.log(request.body.players);
 
     if (!request.body.players || request.body.players.length < 2) {
       request.flash("error", " No. of players should be atleast 2");
@@ -459,7 +447,6 @@ app.post(
     try {
       const stringplayers = request.body.players;
       const intplayers = stringplayers.map(Number);
-      console.log(intplayers);
       const session = await Session.addSession({
         name: request.body.name,
         date: request.body.date,
@@ -470,8 +457,6 @@ app.post(
         sportId: sport.id,
         userId: request.user.id,
       });
-      console.log(url);
-      console.log(session);
 
       const someid = session.id;
       const url2 = `/session_main/${someid}/0`;
@@ -516,7 +501,6 @@ app.post(
       request.flash("error", "Address cannot be empty");
       return response.redirect(`/editsession/${request.params.id}`);
     }
-    console.log(request.body.players);
 
     if (!request.body.players || request.body.players.length < 2) {
       request.flash("error", " No. of players should be atleast 2");
@@ -701,5 +685,76 @@ app.get("/allsports", async (request, response) => {
     return response.status(422).json(error);
   }
 });
+
+
+app.get(
+  "/report",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const flag =0;
+    response.render("report", {
+      flag,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+app.post(
+  "/report",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    if (new Date(request.body.startDate) >= new Date(request.body.endDate)) {
+      request.flash("error", "Enter Valid Range");
+      return response.redirect("/report");
+    }
+    if (!request.body.startDate || !request.body.endDate) {
+      request.flash("error", "Date cannot be empty");
+      return response.redirect("/report");
+    }
+    try {
+    const startDate = request.body.startDate
+    const endDate = request.body.endDate 
+    response.redirect(`/viewreport/${startDate}/${endDate}`)
+    } catch (error) {
+      console.log(error)
+      request.flash("error", error.errors[0].message);
+      response.redirect("/report");
+    }
+  }
+);
+
+app.get(
+  "/viewreport/:startDate/:endDate",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {    
+    try {
+    const sessioncount = await Session.getSessionCount(request.params.startDate,request.params.endDate)
+    const c_sessioncount = await Session.getCancelledSessionCount(request.params.startDate,request.params.endDate)
+    const sortedSports = await Session.getPopularSports(request.params.startDate,request.params.endDate)
+    const result = [];
+    for (const i in sortedSports) {
+      const count = sortedSports[i].count;
+      const sport = await Sport.getSportById(sortedSports[i].sportId);
+      result.push({
+        name:sport.sport_name,
+        count,
+      });
+    }
+    console.log(result)  
+    const sessions = await Session.getSessionsinTimePeriod(request.params.startDate,request.params.endDate)
+    const flag =1;
+    response.render("report", {
+      sessioncount,
+      c_sessioncount,
+      sessions,
+      result,
+      flag,
+      csrfToken: request.csrfToken(),
+    });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 
 module.exports = app;

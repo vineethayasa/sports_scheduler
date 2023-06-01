@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta content="<%= csrfToken %>" name="_csrf" />
+    <link href="./css/styles.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-indigo-200">
+    <%- include("header.ejs") %>
+    <div class="grid grid-cols-7">
+      <div class="mt-4 col-start-1">
+        <a href="/home" class="underline text-indigo-700 text-xl mr-2 ml-5">Home</a>
+      </div>
+      <div class="col-start-3 col-span-3 mt-4 ml-20 mr-20">
+        <h1 class="font-bold text-3xl text-indigo-700 ml-4">Reports</h1>
+        <form action="/report" method="post" class="rounded p-4">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+          <div class="mb-4">
+            <label for="startDate" class="text-indigo-700">Enter Start Date</label>
+            <input type="datetime-local" name="startDate" class="bg-gray-100 text-gray-900 rounded p-2 w-full mx-auto" />
+          </div>
+          <div class="mb-4">
+            <label for="endDate" class="text-indigo-700">Enter End Date</label>
+            <input type="datetime-local" name="endDate" class="bg-gray-100 text-gray-900 rounded p-2 w-full mx-auto" />
+          </div>
+          <div class="flex justify-center">
+            <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">
+              Submit
+            </button>
+          </div>
+        </form>
+        <div class="mt-4 text-red-600">
+          <% if(messages && messages.error && messages.error.length > 0)  { %>
+            <% for(var i=0; i<messages.error.length; i++) { %>
+                    <li> <%= messages.error[i] %></li>
+            <% } %>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (flag) { %>
+        <div class="col-start-3 col-span-3 mb-2">
+          <div class="bg-indigo-100 rounded p-4 mt-8">
+            <h1 class="text-2xl font-bold mb-4">Total Sessions Report</h1>
+            <h2 class="text-lg font-semibold mb-2">Total number of sessions scheduled: <%= sessioncount %></h2>
+            <h2 class="text-lg font-semibold">Cancelled sessions: <%= c_sessioncount %></h2>
+          </div>
+
+          <%if (result.length > 0) { %>
+            <div class=" rounded p-4 mt-8">
+              <h1 class="text-2xl font-bold mb-4">Sessions by Sport</h1>
+              <table class="table-auto w-full bg-indigo-100 rounded-lg overflow-hidden">
+                <thead class="bg-indigo-700 text-indigo-100">
+                  <tr>
+                    <th class="px-4 py-2">Sport</th>
+                    <th class="px-4 py-2">Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% result.forEach((item) => { %>
+                    <tr>
+                      <td class="px-4 py-2"><%= item.name %></td>
+                      <td class="px-4 py-2"><%= item.count %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+                      
+          <%if (sessions.length>0) { %>
+            <div class="rounded p-4 mt-8">
+              <h1 class="text-2xl font-bold mb-4">Sessions Report</h1>
+              <table class="table-auto w-full bg-indigo-100 rounded-lg overflow-hidden">
+                <thead class="bg-indigo-700 text-indigo-100">
+                  <tr>
+                    <th class="px-4 py-2">Sport</th>
+                    <th class="px-4 py-2">Date</th>
+                    <th class="px-4 py-2">Address</th>
+                    <th class="px-4 py-2">Cancelled</th>
+                    <th class="px-4 py-2">Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% sessions.forEach((session) => { %>
+                    <tr>
+                      <td class="px-4 py-2"><%= session.name %></td>
+                      <td class="px-4 py-2"><%= session.date.toDateString() %></td>
+                      <td class="px-4 py-2"><%= session.address %></td>
+                      <td class="px-4 py-2"><%= session.cancelled ? 'Yes' : 'No' %></td>
+                      <td class="px-4 py-2"><%= session.reason %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+            
+          
+        </div>
+      <% } %>
+    </div>
+  </body>
+</html>
