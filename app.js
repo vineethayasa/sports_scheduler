@@ -129,6 +129,10 @@ app.post(
       request.flash("error", "Password cannot be empty");
       return response.redirect("/profile");
     }
+    if (request.body.newpassword.length < 8) {
+      request.flash("error", "Password should be atleast 8 characters long");
+      return response.redirect("/profile");
+    }
     const hashedPwd = await bcrypt.hash(request.body.newpassword, saltRounds);
     if (
       !(await bcrypt.compare(request.body.oldpassword, request.user.password))
@@ -234,6 +238,7 @@ app.get(
     response.render("new_sport", { csrfToken: request.csrfToken() });
   }
 );
+
 app.get(
   "/session_main/:session_id/:flag",
   connectEnsureLogin.ensureLoggedIn(),
@@ -379,7 +384,6 @@ app.post(
   "/editsport/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-
     if (!request.body.sport_name) {
       request.flash("error", "Sport name cannot be empty");
       return response.redirect(`/editsport/${request.params.name}`);
@@ -686,12 +690,11 @@ app.get("/allsports", async (request, response) => {
   }
 });
 
-
 app.get(
   "/report",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const flag =0;
+    const flag = 0;
     response.render("report", {
       flag,
       csrfToken: request.csrfToken(),
@@ -712,11 +715,11 @@ app.post(
       return response.redirect("/report");
     }
     try {
-    const startDate = request.body.startDate
-    const endDate = request.body.endDate 
-    response.redirect(`/viewreport/${startDate}/${endDate}`)
+      const startDate = request.body.startDate;
+      const endDate = request.body.endDate;
+      response.redirect(`/viewreport/${startDate}/${endDate}`);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       request.flash("error", error.errors[0].message);
       response.redirect("/report");
     }
@@ -726,31 +729,43 @@ app.post(
 app.get(
   "/viewreport/:startDate/:endDate",
   connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {    
+  async (request, response) => {
     try {
-    const sessioncount = await Session.getSessionCount(request.params.startDate,request.params.endDate)
-    const c_sessioncount = await Session.getCancelledSessionCount(request.params.startDate,request.params.endDate)
-    const sortedSports = await Session.getPopularSports(request.params.startDate,request.params.endDate)
-    const result = [];
-    for (const i in sortedSports) {
-      const count = sortedSports[i].count;
-      const sport = await Sport.getSportById(sortedSports[i].sportId);
-      result.push({
-        name:sport.sport_name,
-        count,
+      const sessioncount = await Session.getSessionCount(
+        request.params.startDate,
+        request.params.endDate
+      );
+      const c_sessioncount = await Session.getCancelledSessionCount(
+        request.params.startDate,
+        request.params.endDate
+      );
+      const sortedSports = await Session.getPopularSports(
+        request.params.startDate,
+        request.params.endDate
+      );
+      const result = [];
+      for (const i in sortedSports) {
+        const count = sortedSports[i].count;
+        const sport = await Sport.getSportById(sortedSports[i].sportId);
+        result.push({
+          name: sport.sport_name,
+          count,
+        });
+      }
+      console.log(result);
+      const sessions = await Session.getSessionsinTimePeriod(
+        request.params.startDate,
+        request.params.endDate
+      );
+      const flag = 1;
+      response.render("report", {
+        sessioncount,
+        c_sessioncount,
+        sessions,
+        result,
+        flag,
+        csrfToken: request.csrfToken(),
       });
-    }
-    console.log(result)  
-    const sessions = await Session.getSessionsinTimePeriod(request.params.startDate,request.params.endDate)
-    const flag =1;
-    response.render("report", {
-      sessioncount,
-      c_sessioncount,
-      sessions,
-      result,
-      flag,
-      csrfToken: request.csrfToken(),
-    });
     } catch (error) {
       console.log(error);
     }

@@ -183,17 +183,17 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
     static async getSessionCount(startDate, endDate) {
-        const sessionCount = await Session.count({
-          where: {
-            date: {
-              [Op.between]: [startDate, endDate],
-            },
-            cancelled:false,
+      const sessionCount = await Session.count({
+        where: {
+          date: {
+            [Op.between]: [startDate, endDate],
           },
-        });
+          cancelled: false,
+        },
+      });
       return sessionCount;
     }
-    static async getSessionsinTimePeriod(startDate, endDate){
+    static async getSessionsinTimePeriod(startDate, endDate) {
       return await Session.findAll({
         where: {
           date: {
@@ -208,11 +208,11 @@ module.exports = (sequelize, DataTypes) => {
           date: {
             [Op.between]: [startDate, endDate],
           },
-          cancelled:true,
+          cancelled: true,
         },
       });
-    return sessionCount;
-  }
+      return sessionCount;
+    }
     static async getPopularSports(startTime, endTime) {
       const sessions = await Session.findAll({
         where: {
@@ -221,27 +221,29 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       });
-    
+
       const sportCounts = {};
-    
+
       sessions.forEach((session) => {
         const { sportId } = session;
-    
+
         if (sportId in sportCounts) {
           sportCounts[sportId]++;
         } else {
           sportCounts[sportId] = 1;
         }
       });
-    
-      const sortedSports = Object.entries(sportCounts).sort((a, b) => b[1] - a[1]);
-    
+
+      const sortedSports = Object.entries(sportCounts).sort(
+        (a, b) => b[1] - a[1]
+      );
+
       return sortedSports.map(([sportId, count]) => ({
         sportId,
         count,
       }));
     }
-    
+
     static async joinSession(userid, id) {
       const session = await this.getSessionById(id);
       session.players.push(userid);
