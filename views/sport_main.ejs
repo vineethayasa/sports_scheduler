@@ -32,12 +32,12 @@
         <% if(usersessions.length < 1 && othersessions.length < 1){ %>
           <p class="text-xl font-bold text-indigo-700 mt-2 mb-2">There are no sessions available to join right now. Create one?</p>
         <% } else{ %>  
-          <%- include('sessionslist', {title:"Created by you",data: usersessions, flag:0,sportid:current_sport.id}) %>
-          <%- include('sessionslist', {title:"Other Available Sessions",data: othersessions,flag:0, sportid:current_sport.id}) %>
+          <%- include('sessionslist', {title:"Created by you",data: usersessions, flag:0}) %>
+          <%- include('sessionslist', {title:"Other Available Sessions",data: othersessions,flag:0}) %>
        <% } %>
 
-       <%- include('sessionslist', {title:"Joined Sessions",data: joinedsessions,flag:0, sportid:current_sport.id}) %>
-       <%- include('sessionslist', {title:"Cancelled Sessions",data: cancelsessions,flag:2, sportid:current_sport.id}) %>
+       <%- include('sessionslist', {title:"Joined Sessions",data: joinedsessions,flag:0}) %>
+       <%- include('sessionslist', {title:"Cancelled Sessions",data: cancelsessions,flag:2}) %>
 
         <div style="display: flex;" class="mb-8 mt-4">
           <a href="/sportsession/<%= current_sport.sport_name %>/<%= current_sport.id %>" class="underline text-indigo-700 text-xl mr-20">Create a new session</a>

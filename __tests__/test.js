@@ -40,7 +40,7 @@ describe("Sports Scheduler", function () {
     }
   });
 
-  test("Sign Up as Admin", async () => {
+  test("Sign Up as Admin 1", async () => {
     let res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
@@ -49,6 +49,19 @@ describe("Sports Scheduler", function () {
       email: "vineetha@gmail.com",
       role: "Admin",
       password: "vineetha123",
+      _csrf: csrfToken,
+    });
+    expect(res.statusCode).toBe(302);
+  });
+  test("Sign Up as Admin 2", async () => {
+    let res = await agent.get("/signup");
+    const csrfToken = extractCsrfToken(res);
+    res = await agent.post("/users").send({
+      firstName: "Sandhya",
+      lastName: "Rani",
+      email: "sandhya@gmail.com",
+      role: "Admin",
+      password: "sandhya123",
       _csrf: csrfToken,
     });
     expect(res.statusCode).toBe(302);
@@ -110,6 +123,13 @@ describe("Sports Scheduler", function () {
     const updatedSport = await Sport.getSportById(1);
     expect(updatedSport.sport_name).toBe("Badminton");
   });
+  test("Other Admin can't edit sport", async () => {
+    const agent = request.agent(server);
+    await login(agent, "sandhya@gmail.com", "sandhya123");
+    const res = await agent.get("/editsport/Badminton/1");
+    // does not render the edit sport form
+    expect(res.statusCode).toBe(401);
+  });
   test("Deleting a sport as Admin", async () => {
     const agent = request.agent(server);
     await login(agent, "vineetha@gmail.com", "vineetha123");
@@ -135,6 +155,12 @@ describe("Sports Scheduler", function () {
 
     const updatedSport = await Sport.getSportById(2);
     expect(updatedSport).toBe(null);
+  });
+  test("Other Admin can't delete sport", async () => {
+    const agent = request.agent(server);
+    await login(agent, "sandhya@gmail.com", "sandhya123");
+    const res = await agent.get("/deletesport/1");
+    expect(res.statusCode).toBe(401);
   });
   test("Viewing reports", async () => {
     const agent = request.agent(server);
@@ -188,7 +214,7 @@ describe("Sports Scheduler", function () {
       name: "Badminton",
       date: tomorrow,
       address: "Parade Ground",
-      players: [1, 3, 4], //id of players since there maybe multiple people with same name
+      players: [1, 5, 4], //id of players since there maybe multiple people with same name
       count: 4,
       cancelled: false,
       _csrf: csrfToken,
@@ -204,7 +230,7 @@ describe("Sports Scheduler", function () {
     res = await agent.get("/home");
     expect(res.statusCode).toBe(302);
   });
-  test("Sign Up as Player", async () => {
+  test("Sign Up as Player 1", async () => {
     let res = await agent.get("/signup");
     const csrfToken = extractCsrfToken(res);
     res = await agent.post("/users").send({
@@ -213,6 +239,19 @@ describe("Sports Scheduler", function () {
       email: "srinivas@gmail.com",
       role: "Player",
       password: "srinivas123",
+      _csrf: csrfToken,
+    });
+    expect(res.statusCode).toBe(302);
+  });
+  test("Sign Up as Player 2", async () => {
+    let res = await agent.get("/signup");
+    const csrfToken = extractCsrfToken(res);
+    res = await agent.post("/users").send({
+      firstName: "Nitish",
+      lastName: "Reddy",
+      email: "nitish@gmail.com",
+      role: "Player",
+      password: "nitish123",
       _csrf: csrfToken,
     });
     expect(res.statusCode).toBe(302);
@@ -242,6 +281,24 @@ describe("Sports Scheduler", function () {
     });
     expect(response.statusCode).toBe(302);
     expect(response.headers.location).toBe("/home");
+  });
+  test("Player can't create sport", async () => {
+    const agent = request.agent(server);
+    await login(agent, "srinivas@gmail.com", "password123");
+    const res = await agent.get("/sport");
+    expect(res.statusCode).toBe(401);
+  });
+  test("Player can't edit sport", async () => {
+    const agent = request.agent(server);
+    await login(agent, "srinivas@gmail.com", "password123");
+    const res = await agent.get("/editsport/Badminton/1");
+    expect(res.statusCode).toBe(401);
+  });
+  test("Player can't delete sport", async () => {
+    const agent = request.agent(server);
+    await login(agent, "srinivas@gmail.com", "password123");
+    const res = await agent.get("/deletesport/1");
+    expect(res.statusCode).toBe(401);
   });
   test("Creating a session as Player", async () => {
     const agent = request.agent(server);
@@ -291,14 +348,14 @@ describe("Sports Scheduler", function () {
     expect(res1.statusCode).toBe(200);
 
     const updatedSession1 = await Session.getSessionById(1); // 1 is session id
-    expect(updatedSession1.players).not.toContain(2); // 2 is user id
+    expect(updatedSession1.players).not.toContain(3); // 3 is user id
 
     const response = await agent.get("/joinsession/1");
     expect(response.statusCode).toBe(302);
     expect(response.headers.location).toBe("/session_main/1/0");
 
     const updatedSession2 = await Session.getSessionById(1); // 1 is session id
-    expect(updatedSession2.players).toContain(2); // 2 is user id
+    expect(updatedSession2.players).toContain(3); // 3 is user id
   });
   test("Leave a session", async () => {
     const agent = request.agent(server);
@@ -308,14 +365,14 @@ describe("Sports Scheduler", function () {
     expect(res1.statusCode).toBe(200);
 
     const updatedSession1 = await Session.getSessionById(1); // 1 is session id
-    expect(updatedSession1.players).toContain(2); // 2 is user id
+    expect(updatedSession1.players).toContain(3); // 3 is user id
 
     const response = await agent.get("/leavesession/1");
     expect(response.statusCode).toBe(302);
     expect(response.headers.location).toBe("/session_main/1/0");
 
     const updatedSession2 = await Session.getSessionById(1); // 1 is session id
-    expect(updatedSession2.players).not.toContain(2); // 2 is user id
+    expect(updatedSession2.players).not.toContain(3); // 3 is user id
   });
   test("Editing a session", async () => {
     const agent = request.agent(server);
@@ -368,6 +425,19 @@ describe("Sports Scheduler", function () {
     const updatedSession = await Session.getSessionById(2);
     expect(updatedSession.reason).toBe("Bad Weather");
   });
+  test("Other user can't edit session", async () => {
+    const agent = request.agent(server);
+    await login(agent, "nitish@gmail.com", "nitish123");
+    const res = await agent.get("/editsession/2/1/Badminton");
+    expect(res.statusCode).toBe(401);
+  });
+  test("Other user can't cancel session", async () => {
+    const agent = request.agent(server);
+    await login(agent, "nitish@gmail.com", "nitish123");
+    const res = await agent.get("/cancelsession/2/1/Badminton");
+    expect(res.statusCode).toBe(401);
+  });
+
   test("Sign out as Player", async () => {
     let res = await agent.get("/home");
     expect(res.statusCode).toBe(200);

@@ -73,6 +73,14 @@ passport.use(
   )
 );
 
+function requirePublisher(request, response, next) {
+  if (request.user && request.user.role === "Admin") {
+    return next();
+  } else {
+    response.status(401).json({ message: "Unauthorized user." });
+  }
+}
+
 passport.serializeUser((user, done) => {
   console.log("Serializing user in session", user.id);
   done(null, user.id);
@@ -98,6 +106,18 @@ app.get("/signup", (request, response) => {
 app.get("/login", (request, response) => {
   response.render("login", { csrfToken: request.csrfToken() });
 });
+
+app.post(
+  "/session",
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    failureFlash: true,
+  }),
+  async (request, response) => {
+    console.log(request.user);
+    response.redirect("/home");
+  }
+);
 
 app.get("/signout", (request, response, next) => {
   request.logout((err) => {
@@ -174,18 +194,7 @@ app.get(
   }
 );
 
-app.post(
-  "/session",
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    failureFlash: true,
-  }),
-  async (request, response) => {
-    console.log(request.user);
-    response.redirect("/home");
-  }
-);
-
+// post signup
 app.post("/users", async (request, response) => {
   if (!request.body.firstName) {
     request.flash("error", "First Name cannot be empty");
@@ -231,83 +240,42 @@ app.post("/users", async (request, response) => {
   }
 });
 
+// get create sport
 app.get(
   "/sport",
   connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
   async (request, response) => {
     response.render("new_sport", { csrfToken: request.csrfToken() });
   }
 );
 
-app.get(
-  "/session_main/:session_id/:flag",
+//post create sport
+app.post(
+  "/sport",
   connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
   async (request, response) => {
-    const session_id = request.params.session_id;
-    const session_details = await Session.getSessionById(session_id);
-    const userid = request.user.id;
-    const session_name = session_details.name;
-    const session_date = session_details.date.toLocaleDateString();
-    const session_time = session_details.date.toLocaleTimeString();
-    const session_address = session_details.address;
-    const session_players_id = session_details.players;
-    const session_creator = session_details.userId;
-    const session_reason = session_details.reason;
-    const sportid = session_details.sportId;
-    const flag = request.params.flag;
+    if (!request.body.sport_name) {
+      request.flash("error", "Sport name cannot be empty");
+      return response.redirect("/sport");
+    }
+    try {
+      const sport = await Sport.addSport({
+        sport_name: request.body.sport_name,
+        userId: request.user.id,
+      });
+      const url = `/sport_main/${sport.id}`;
+      response.redirect(url);
+    } catch (error) {
+      console.log(error);
+      request.flash("error", error.errors[0].message);
+      response.redirect("/sport");
+    }
+  }
+);
 
-    const session_players = await Promise.all(
-      session_players_id.map(async (id) => await User.getUser(id))
-    );
-
-    response.render("session_main", {
-      userid,
-      session_id,
-      session_name,
-      session_date,
-      session_time,
-      session_address,
-      session_players,
-      session_creator,
-      session_reason,
-      sportid,
-      flag,
-      csrfToken: request.csrfToken(),
-    });
-  }
-);
-app.get(
-  "/sportsession/:sport_name/:id",
-  connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {
-    const data = await User.getAllUsers();
-    const current_sport_name = request.params.sport_name;
-    const current_sport_id = request.params.id;
-    response.render("sportsessions", {
-      data,
-      current_sport_name,
-      current_sport_id,
-      csrfToken: request.csrfToken(),
-    });
-  }
-);
-app.get(
-  "/previoussession/:sportid",
-  connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {
-    const sport = await Sport.getSportById(request.params.sportid);
-    const userid = request.user.id;
-    const previoussessions = await Session.getPreviousSessions(
-      request.params.sportid
-    );
-    response.render("previoussession", {
-      sport,
-      userid,
-      previoussessions,
-      csrfToken: request.csrfToken(),
-    });
-  }
-);
+//main sport page
 app.get(
   "/sport_main/:id",
   connectEnsureLogin.ensureLoggedIn(),
@@ -342,40 +310,24 @@ app.get(
   }
 );
 
-app.post(
-  "/sport",
-  connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {
-    if (!request.body.sport_name) {
-      request.flash("error", "Sport name cannot be empty");
-      return response.redirect("/sport");
-    }
-    try {
-      const sport = await Sport.addSport({
-        sport_name: request.body.sport_name,
-        userId: request.user.id,
-      });
-      const url = `/sport_main/${sport.id}`;
-      response.redirect(url);
-    } catch (error) {
-      console.log(error);
-      request.flash("error", error.errors[0].message);
-      response.redirect("/sport");
-    }
-  }
-);
 //get edit sport
 app.get(
   "/editsport/:name/:id",
   connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
   async (request, response) => {
-    const sport_name = request.params.name;
-    const sport_id = request.params.id;
-    response.render("editsport", {
-      sport_name,
-      sport_id,
-      csrfToken: request.csrfToken(),
-    });
+    const sport = await Sport.getSportById(request.params.id);
+    if (sport.userId === request.user.id) {
+      const sport_name = request.params.name;
+      const sport_id = request.params.id;
+      response.render("editsport", {
+        sport_name,
+        sport_id,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.status(401).json({ message: "Unauthorized user." });
+    }
   }
 );
 
@@ -383,6 +335,7 @@ app.get(
 app.post(
   "/editsport/:name",
   connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
   async (request, response) => {
     if (!request.body.sport_name) {
       request.flash("error", "Sport name cannot be empty");
@@ -406,6 +359,45 @@ app.post(
   }
 );
 
+// delete sport
+app.get(
+  "/deletesport/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
+  async (request, response) => {
+    try {
+      const sport = await Sport.getSportById(request.params.id);
+      if (request.user.id === sport.userId) {
+        await User.removeSport(request.params.id);
+        await Session.removeSessionbySport(request.params.id);
+        await Sport.remove(request.params.id);
+        response.redirect("/home");
+      } else {
+        response.status(401).json({ message: "Unauthorized user." });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+//get create session
+app.get(
+  "/sportsession/:sport_name/:id",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const data = await User.getAllUsers();
+    const current_sport_name = request.params.sport_name;
+    const current_sport_id = request.params.id;
+    response.render("sportsessions", {
+      data,
+      current_sport_name,
+      current_sport_id,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+//post create session
 app.post(
   "/sportsession",
   connectEnsureLogin.ensureLoggedIn(),
@@ -473,22 +465,85 @@ app.post(
   }
 );
 
+//main session page
+app.get(
+  "/session_main/:session_id/:flag",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const session_id = request.params.session_id;
+    const session_details = await Session.getSessionById(session_id);
+    const userid = request.user.id;
+    const session_name = session_details.name;
+    const session_date = session_details.date.toLocaleDateString();
+    const session_time = session_details.date.toLocaleTimeString();
+    const session_address = session_details.address;
+    const session_players_id = session_details.players;
+    const session_creator = session_details.userId;
+    const session_reason = session_details.reason;
+    const sportid = session_details.sportId;
+    const flag = request.params.flag;
+
+    const session_players = await Promise.all(
+      session_players_id.map(async (id) => await User.getUser(id))
+    );
+
+    response.render("session_main", {
+      userid,
+      session_id,
+      session_name,
+      session_date,
+      session_time,
+      session_address,
+      session_players,
+      session_creator,
+      session_reason,
+      sportid,
+      flag,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
+// previous sessions
+app.get(
+  "/previoussession/:sportid",
+  connectEnsureLogin.ensureLoggedIn(),
+  async (request, response) => {
+    const sport = await Sport.getSportById(request.params.sportid);
+    const userid = request.user.id;
+    const previoussessions = await Session.getPreviousSessions(
+      request.params.sportid
+    );
+    response.render("previoussession", {
+      sport,
+      userid,
+      previoussessions,
+      csrfToken: request.csrfToken(),
+    });
+  }
+);
+
 //get edit session
 app.get(
   "/editsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const session_id = request.params.id;
-    const sport_id = request.params.sportid;
-    const sport_name = request.params.name;
-    const data = await User.getAllUsers();
-    response.render("editsession", {
-      session_id,
-      sport_id,
-      sport_name,
-      data,
-      csrfToken: request.csrfToken(),
-    });
+    const session = await Session.getSessionById(request.params.id);
+    if (session.userId === request.user.id) {
+      const session_id = request.params.id;
+      const sport_id = request.params.sportid;
+      const sport_name = request.params.name;
+      const data = await User.getAllUsers();
+      response.render("editsession", {
+        session_id,
+        sport_id,
+        sport_name,
+        data,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.status(401).json({ message: "Unauthorized user." });
+    }
   }
 );
 
@@ -533,15 +588,20 @@ app.get(
   "/cancelsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const session_id = request.params.id;
-    const sport_id = request.params.sportid;
-    const sport_name = request.params.name;
-    response.render("cancelsession", {
-      session_id,
-      sport_id,
-      sport_name,
-      csrfToken: request.csrfToken(),
-    });
+    const session = await Session.getSessionById(request.params.id);
+    if (session.userId === request.user.id) {
+      const session_id = request.params.id;
+      const sport_id = request.params.sportid;
+      const sport_name = request.params.name;
+      response.render("cancelsession", {
+        session_id,
+        sport_id,
+        sport_name,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.status(401).json({ message: "Unauthorized user." });
+    }
   }
 );
 
@@ -564,22 +624,6 @@ app.post(
       console.log(error);
       request.flash("error", error.errors[0].message);
       response.redirect(`/cancelsession/${request.params.id}`);
-    }
-  }
-);
-
-// delete sport
-app.get(
-  "/deletesport/:id",
-  connectEnsureLogin.ensureLoggedIn(),
-  async (request, response) => {
-    try {
-      await User.removeSport(request.params.id);
-      await Session.removeSessionbySport(request.params.id);
-      await Sport.remove(request.params.id);
-      response.redirect("/home");
-    } catch (error) {
-      console.log(error);
     }
   }
 );
@@ -643,6 +687,7 @@ app.get(
   }
 );
 
+//remove a player
 app.get(
   "/removeplayer/:playerid/:sessionid",
   connectEnsureLogin.ensureLoggedIn(),
@@ -660,39 +705,10 @@ app.get(
   }
 );
 
-app.get("/allsessions", async (request, response) => {
-  try {
-    const sessions = await Session.findAll();
-    return response.send(sessions);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-
-app.get("/allusers", async (request, response) => {
-  try {
-    const users = await User.findAll();
-    return response.send(users);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-
-app.get("/allsports", async (request, response) => {
-  try {
-    const sports = await Sport.findAll();
-    return response.send(sports);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-
 app.get(
   "/report",
   connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
   async (request, response) => {
     const flag = 0;
     response.render("report", {
@@ -705,6 +721,7 @@ app.get(
 app.post(
   "/report",
   connectEnsureLogin.ensureLoggedIn(),
+  requirePublisher,
   async (request, response) => {
     if (new Date(request.body.startDate) >= new Date(request.body.endDate)) {
       request.flash("error", "Enter Valid Range");
@@ -728,6 +745,7 @@ app.post(
 
 app.get(
   "/viewreport/:startDate/:endDate",
+  requirePublisher,
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     try {
