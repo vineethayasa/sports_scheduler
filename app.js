@@ -74,10 +74,10 @@ passport.use(
 );
 
 function requirePublisher(request, response, next) {
-  if (request.user && request.user.role === 'Admin') {
+  if (request.user && request.user.role === "Admin") {
     return next();
   } else {
-    response.status(401).json({ message: 'Unauthorized user.' });
+    response.status(401).json({ message: "Unauthorized user." });
   }
 }
 
@@ -316,19 +316,18 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   requirePublisher,
   async (request, response) => {
-    const sport = await Sport.getSportById(request.params.id)
-    if (sport.userId === request.user.id){
+    const sport = await Sport.getSportById(request.params.id);
+    if (sport.userId === request.user.id) {
       const sport_name = request.params.name;
-    const sport_id = request.params.id;
-    response.render("editsport", {
-      sport_name,
-      sport_id,
-      csrfToken: request.csrfToken(),
-    });
-    }else {
-      response.status(401).json({ message: 'Unauthorized user.' });
+      const sport_id = request.params.id;
+      response.render("editsport", {
+        sport_name,
+        sport_id,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.status(401).json({ message: "Unauthorized user." });
     }
-    
   }
 );
 
@@ -367,14 +366,14 @@ app.get(
   requirePublisher,
   async (request, response) => {
     try {
-      const sport = await Sport.getSportById(request.params.id)
-      if (request.user.id === sport.userId){
+      const sport = await Sport.getSportById(request.params.id);
+      if (request.user.id === sport.userId) {
         await User.removeSport(request.params.id);
         await Session.removeSessionbySport(request.params.id);
         await Sport.remove(request.params.id);
         response.redirect("/home");
       } else {
-        response.status(401).json({ message: 'Unauthorized user.' });
+        response.status(401).json({ message: "Unauthorized user." });
       }
     } catch (error) {
       console.log(error);
@@ -404,21 +403,11 @@ app.post(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const sport = await Sport.getSportByName(request.body.name);
-    const somename = request.body.name;
-    const url = `/sportsession/${somename}`;
-    const today = new Date();
-    const session_d = new Date(request.body.date);
-
-    const today_date = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-    const session_date = new Date(
-      session_d.getFullYear(),
-      session_d.getMonth(),
-      session_d.getDate()
-    );
+    const sportname = request.body.name;
+    const sportid = sport.id;
+    const url = `/sportsession/${sportname}/${sportid}`;
+    const today_date = new Date();
+    const session_date = new Date(request.body.date);
 
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
@@ -510,13 +499,11 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
     const sport = await Sport.getSportById(request.params.sportid);
-    const userid = request.user.id;
     const previoussessions = await Session.getPreviousSessions(
       request.params.sportid
     );
     response.render("previoussession", {
       sport,
-      userid,
       previoussessions,
       csrfToken: request.csrfToken(),
     });
@@ -528,8 +515,8 @@ app.get(
   "/editsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const session = await Session.getSessionById(request.params.id)
-    if (session.userId === request.user.id){
+    const session = await Session.getSessionById(request.params.id);
+    if (session.userId === request.user.id) {
       const session_id = request.params.id;
       const sport_id = request.params.sportid;
       const sport_name = request.params.name;
@@ -542,7 +529,7 @@ app.get(
         csrfToken: request.csrfToken(),
       });
     } else {
-      response.status(401).json({ message: 'Unauthorized user.' });
+      response.status(401).json({ message: "Unauthorized user." });
     }
   }
 );
@@ -552,22 +539,31 @@ app.post(
   "/editsession/:id",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    const session = await Session.getSessionById(request.params.id);
+    const sportid = session.sportId;
+    const sportname = session.name;
+    const url = `/editsession/${request.params.id}/${sportid}/${sportname}`;
+    session_date = new Date(request.body.date);
+    today_date = new Date();
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
-      return response.redirect(`/editsession/${request.params.id}`);
+      return response.redirect(url);
+    }
+    if (session_date < today_date) {
+      request.flash("error", "You cannot enter a past date");
+      return response.redirect(url);
     }
     if (!request.body.address) {
       request.flash("error", "Address cannot be empty");
-      return response.redirect(`/editsession/${request.params.id}`);
+      return response.redirect(url);
     }
-
     if (!request.body.players || request.body.players.length < 2) {
       request.flash("error", " No. of players should be atleast 2");
-      return response.redirect(`/editsession/${request.params.id}`);
+      return response.redirect(url);
     }
     if (!request.body.count) {
       request.flash("error", "Enter 0 if no extra players needed");
-      return response.redirect(`/editsession/${request.params.id}`);
+      return response.redirect(url);
     }
     try {
       const session = await Session.updateSession(
@@ -578,7 +574,7 @@ app.post(
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
-      response.redirect(`/editsession/${request.params.id}`);
+      response.redirect(url);
     }
   }
 );
@@ -588,19 +584,19 @@ app.get(
   "/cancelsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const session = await Session.getSessionById(request.params.id)
-    if (session.userId === request.user.id){
+    const session = await Session.getSessionById(request.params.id);
+    if (session.userId === request.user.id) {
       const session_id = request.params.id;
-    const sport_id = request.params.sportid;
-    const sport_name = request.params.name;
-    response.render("cancelsession", {
-      session_id,
-      sport_id,
-      sport_name,
-      csrfToken: request.csrfToken(),
-    });
+      const sport_id = request.params.sportid;
+      const sport_name = request.params.name;
+      response.render("cancelsession", {
+        session_id,
+        sport_id,
+        sport_name,
+        csrfToken: request.csrfToken(),
+      });
     } else {
-      response.status(401).json({ message: 'Unauthorized user.' });
+      response.status(401).json({ message: "Unauthorized user." });
     }
   }
 );
@@ -610,9 +606,15 @@ app.post(
   "/cancelsession/:id/:sportid",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
+    const ses = await Session.getSessionById(request.params.id);
+    const sessionid = ses.id;
+    const sportid = ses.sportId;
+    const sessionname = ses.name;
     if (!request.body.reason) {
       request.flash("error", "Enter valid reason");
-      return response.redirect(`/cancelsession/${request.params.id}`);
+      return response.redirect(
+        `/cancelsession/${sessionid}/${sportid}/${sessionname}`
+      );
     }
     try {
       const session = await Session.cancelSession(
@@ -623,7 +625,9 @@ app.post(
     } catch (error) {
       console.log(error);
       request.flash("error", error.errors[0].message);
-      response.redirect(`/cancelsession/${request.params.id}`);
+      response.redirect(
+        `/cancelsession/${sessionid}/${sportid}/${sessionname}`
+      );
     }
   }
 );
