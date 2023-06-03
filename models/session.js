@@ -39,7 +39,8 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
     static async getUsersSessions(userId, sportId) {
-      const today = new Date();
+      try {
+        const today = new Date();
       return await this.findAll({
         where: {
           userId: userId,
@@ -50,17 +51,25 @@ module.exports = (sequelize, DataTypes) => {
           sportId: sportId,
         },
       });
+      } catch (error) {
+        console.error("Error in getUsersSessions:", error);
+      }
     }
     static async getCancelledSessions(sportId) {
-      return await this.findAll({
-        where: {
-          cancelled: true,
-          sportId: sportId,
-        },
-      });
+      try {
+        return await this.findAll({
+          where: {
+            cancelled: true,
+            sportId: sportId,
+          },
+        });
+      } catch (error) {
+        console.error("Error in getCancelledSessions:", error);
+      }
     }
     static async getPreviousSessions(sportId) {
-      const today = new Date();
+      try {
+        const today = new Date();
       return await this.findAll({
         where: {
           sportId: sportId,
@@ -69,9 +78,13 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       });
+      } catch (error) {
+        console.error("Error in getPreviousSessions:", error);
+      }
     }
     static async getOthersSessions(userId, sportId) {
-      const today = new Date();
+      try {
+        const today = new Date();
       return await this.findAll({
         where: {
           userId: {
@@ -92,9 +105,13 @@ module.exports = (sequelize, DataTypes) => {
           sportId: sportId,
         },
       });
+      } catch (error) {
+        console.error("Error in getOthersSessions:", error);
+      }
     }
     static async getJoinedSessions(userId, sportId) {
-      const today = new Date();
+      try {
+        const today = new Date();
       return await this.findAll({
         where: {
           sportId: sportId,
@@ -107,20 +124,27 @@ module.exports = (sequelize, DataTypes) => {
           cancelled: false,
         },
       });
+      } catch (error) {
+        console.error("Error in getJoinedSessions:", error);
+      }
     }
     static async getUpcomingSessions(userId) {
-      const today = new Date();
-      return await this.findAll({
-        where: {
-          players: {
-            [Op.contains]: [userId],
+      try {
+        const today = new Date();
+        return await this.findAll({
+          where: {
+            players: {
+              [Op.contains]: [userId],
+            },
+            date: {
+              [Op.gt]: today,
+            },
+            cancelled: false,
           },
-          date: {
-            [Op.gt]: today,
-          },
-          cancelled: false,
-        },
-      });
+        });
+      } catch (error) {
+        console.error("Error in getUpcomingSessions:", error);
+      }
     }
 
     static updateSession(id, body) {
