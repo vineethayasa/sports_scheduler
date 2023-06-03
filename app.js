@@ -74,10 +74,10 @@ passport.use(
 );
 
 function requirePublisher(request, response, next) {
-  if (request.user && request.user.role === "Admin") {
+  if (request.user && request.user.role === 'Admin') {
     return next();
   } else {
-    response.status(401).json({ message: "Unauthorized user." });
+    response.status(401).json({ message: 'Unauthorized user.' });
   }
 }
 
@@ -316,18 +316,19 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   requirePublisher,
   async (request, response) => {
-    const sport = await Sport.getSportById(request.params.id);
-    if (sport.userId === request.user.id) {
+    const sport = await Sport.getSportById(request.params.id)
+    if (sport.userId === request.user.id){
       const sport_name = request.params.name;
-      const sport_id = request.params.id;
-      response.render("editsport", {
-        sport_name,
-        sport_id,
-        csrfToken: request.csrfToken(),
-      });
-    } else {
-      response.status(401).json({ message: "Unauthorized user." });
+    const sport_id = request.params.id;
+    response.render("editsport", {
+      sport_name,
+      sport_id,
+      csrfToken: request.csrfToken(),
+    });
+    }else {
+      response.status(401).json({ message: 'Unauthorized user.' });
     }
+    
   }
 );
 
@@ -366,14 +367,14 @@ app.get(
   requirePublisher,
   async (request, response) => {
     try {
-      const sport = await Sport.getSportById(request.params.id);
-      if (request.user.id === sport.userId) {
+      const sport = await Sport.getSportById(request.params.id)
+      if (request.user.id === sport.userId){
         await User.removeSport(request.params.id);
         await Session.removeSessionbySport(request.params.id);
         await Sport.remove(request.params.id);
         response.redirect("/home");
       } else {
-        response.status(401).json({ message: "Unauthorized user." });
+        response.status(401).json({ message: 'Unauthorized user.' });
       }
     } catch (error) {
       console.log(error);
@@ -447,13 +448,12 @@ app.post(
         name: request.body.name,
         date: request.body.date,
         address: request.body.address,
-        players: request.body.players,
+        players: intplayers,
         count: request.body.count,
         cancelled: false,
         sportId: sport.id,
         userId: request.user.id,
       });
-
       const someid = session.id;
       const url2 = `/session_main/${someid}/0`;
       response.redirect(url2);
@@ -528,8 +528,8 @@ app.get(
   "/editsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const session = await Session.getSessionById(request.params.id);
-    if (session.userId === request.user.id) {
+    const session = await Session.getSessionById(request.params.id)
+    if (session.userId === request.user.id){
       const session_id = request.params.id;
       const sport_id = request.params.sportid;
       const sport_name = request.params.name;
@@ -542,7 +542,7 @@ app.get(
         csrfToken: request.csrfToken(),
       });
     } else {
-      response.status(401).json({ message: "Unauthorized user." });
+      response.status(401).json({ message: 'Unauthorized user.' });
     }
   }
 );
@@ -588,19 +588,19 @@ app.get(
   "/cancelsession/:id/:sportid/:name",
   connectEnsureLogin.ensureLoggedIn(),
   async (request, response) => {
-    const session = await Session.getSessionById(request.params.id);
-    if (session.userId === request.user.id) {
+    const session = await Session.getSessionById(request.params.id)
+    if (session.userId === request.user.id){
       const session_id = request.params.id;
-      const sport_id = request.params.sportid;
-      const sport_name = request.params.name;
-      response.render("cancelsession", {
-        session_id,
-        sport_id,
-        sport_name,
-        csrfToken: request.csrfToken(),
-      });
+    const sport_id = request.params.sportid;
+    const sport_name = request.params.name;
+    response.render("cancelsession", {
+      session_id,
+      sport_id,
+      sport_name,
+      csrfToken: request.csrfToken(),
+    });
     } else {
-      response.status(401).json({ message: "Unauthorized user." });
+      response.status(401).json({ message: 'Unauthorized user.' });
     }
   }
 );

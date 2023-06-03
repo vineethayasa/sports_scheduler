@@ -131,10 +131,12 @@ module.exports = (sequelize, DataTypes) => {
     static async getUpcomingSessions(userId) {
       try {
         const today = new Date();
+        console.log('Data type of userId:', typeof userId);
+        console.log('Data type of players:', typeof [userId]);
         return await this.findAll({
           where: {
             players: {
-              [Op.contains]: [userId],
+              [Op.contains]: [String(userId)],
             },
             date: {
               [Op.gt]: today,
