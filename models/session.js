@@ -41,20 +41,20 @@ module.exports = (sequelize, DataTypes) => {
     static async getUsersSessions(userId, sportId) {
       try {
         const today = new Date();
-      return await this.findAll({
-        where: {
-          userId: userId,
-          date: {
-            [Op.gt]: today,
+        return await this.findAll({
+          where: {
+            userId: String(userId),
+            date: {
+              [Op.gt]: today,
+            },
+            cancelled: false,
+            sportId: String(sportId),
           },
-          cancelled: false,
-          sportId: sportId,
-        },
-      });
+        });
       } catch (error) {
         console.error("Error in getUsersSessions:", error);
       }
-    }
+    }    
     static async getCancelledSessions(sportId) {
       try {
         return await this.findAll({
