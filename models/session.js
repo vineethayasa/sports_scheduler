@@ -95,7 +95,7 @@ module.exports = (sequelize, DataTypes) => {
           },
           [Op.not]: {
             players: {
-              [Op.contains]: [userId],
+              [Op.contains]: [String(userId)],
             },
           },
           count: {
@@ -116,7 +116,7 @@ module.exports = (sequelize, DataTypes) => {
         where: {
           sportId: sportId,
           players: {
-            [Op.contains]: [userId],
+            [Op.contains]: [String(userId)],
           },
           date: {
             [Op.gt]: today,
