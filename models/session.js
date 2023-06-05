@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
       } catch (error) {
         console.error("Error in getUsersSessions:", error);
       }
-    }    
+    }
     static async getCancelledSessions(sportId) {
       try {
         return await this.findAll({
@@ -70,14 +70,14 @@ module.exports = (sequelize, DataTypes) => {
     static async getPreviousSessions(sportId) {
       try {
         const today = new Date();
-      return await this.findAll({
-        where: {
-          sportId: sportId,
-          date: {
-            [Op.lt]: today,
+        return await this.findAll({
+          where: {
+            sportId: sportId,
+            date: {
+              [Op.lt]: today,
+            },
           },
-        },
-      });
+        });
       } catch (error) {
         console.error("Error in getPreviousSessions:", error);
       }
@@ -85,26 +85,26 @@ module.exports = (sequelize, DataTypes) => {
     static async getOthersSessions(userId, sportId) {
       try {
         const today = new Date();
-      return await this.findAll({
-        where: {
-          userId: {
-            [Op.not]: userId,
-          },
-          date: {
-            [Op.gt]: today,
-          },
-          [Op.not]: {
-            players: {
-              [Op.contains]: [String(userId)],
+        return await this.findAll({
+          where: {
+            userId: {
+              [Op.not]: userId,
             },
+            date: {
+              [Op.gt]: today,
+            },
+            [Op.not]: {
+              players: {
+                [Op.contains]: [String(userId)],
+              },
+            },
+            count: {
+              [Op.gt]: 0,
+            },
+            cancelled: false,
+            sportId: sportId,
           },
-          count: {
-            [Op.gt]: 0,
-          },
-          cancelled: false,
-          sportId: sportId,
-        },
-      });
+        });
       } catch (error) {
         console.error("Error in getOthersSessions:", error);
       }
@@ -112,18 +112,18 @@ module.exports = (sequelize, DataTypes) => {
     static async getJoinedSessions(userId, sportId) {
       try {
         const today = new Date();
-      return await this.findAll({
-        where: {
-          sportId: sportId,
-          players: {
-            [Op.contains]: [String(userId)],
+        return await this.findAll({
+          where: {
+            sportId: sportId,
+            players: {
+              [Op.contains]: [String(userId)],
+            },
+            date: {
+              [Op.gt]: today,
+            },
+            cancelled: false,
           },
-          date: {
-            [Op.gt]: today,
-          },
-          cancelled: false,
-        },
-      });
+        });
       } catch (error) {
         console.error("Error in getJoinedSessions:", error);
       }
@@ -131,8 +131,6 @@ module.exports = (sequelize, DataTypes) => {
     static async getUpcomingSessions(userId) {
       try {
         const today = new Date();
-        console.log('Data type of userId:', typeof userId);
-        console.log('Data type of players:', typeof [userId]);
         return await this.findAll({
           where: {
             players: {

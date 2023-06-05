@@ -317,8 +317,8 @@ app.get(
   requirePublisher,
   async (request, response) => {
     const sport = await Sport.getSportById(request.params.id);
-    if (sport.userId === request.user.id) {
-      const sport_name = request.params.name;
+    if (sport.userId == request.user.id) {
+      const sport_name = sport.sport_name;
       const sport_id = request.params.id;
       response.render("editsport", {
         sport_name,
@@ -337,13 +337,15 @@ app.post(
   connectEnsureLogin.ensureLoggedIn(),
   requirePublisher,
   async (request, response) => {
+    const sport = await Sport.getSportByName(request.params.name)
+    const sportid = sport.id
     if (!request.body.sport_name) {
       request.flash("error", "Sport name cannot be empty");
-      return response.redirect(`/editsport/${request.params.name}`);
+      return response.redirect(`/editsport/${request.params.name}/${sportid}`);
     }
     if (request.body.sport_name === request.params.name) {
       request.flash("error", "Sport name cannot be same");
-      return response.redirect(`/editsport/${request.params.name}`);
+      return response.redirect(`/editsport/${request.params.name}/${sportid}`);
     }
     try {
       const sport = await Sport.getSportByName(request.params.name);
@@ -793,5 +795,15 @@ app.get(
     }
   }
 );
+
+app.get("/allsports", async (request, response) => {
+  try {
+    const sports = await Sport.findAll();
+    return response.send(sports);
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
+  }
+});
 
 module.exports = app;
