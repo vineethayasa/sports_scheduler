@@ -763,20 +763,10 @@ app.get(
         request.params.startDate,
         request.params.endDate
       );
-      const sortedSports = await Session.getPopularSports(
+      const result = await Session.getPopularSports(
         request.params.startDate,
         request.params.endDate
       );
-      const result = [];
-      for (const i in sortedSports) {
-        const count = sortedSports[i].count;
-        const sport = await Sport.getSportById(sortedSports[i].sportId);
-        result.push({
-          name: sport.sport_name,
-          count,
-        });
-      }
-      console.log(result);
       const sessions = await Session.getSessionsinTimePeriod(
         request.params.startDate,
         request.params.endDate
@@ -795,15 +785,5 @@ app.get(
     }
   }
 );
-
-app.get("/allsports", async (request, response) => {
-  try {
-    const sports = await Sport.findAll();
-    return response.send(sports);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
 
 module.exports = app;

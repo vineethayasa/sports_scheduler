@@ -249,12 +249,12 @@ module.exports = (sequelize, DataTypes) => {
       const sportCounts = {};
 
       sessions.forEach((session) => {
-        const { sportId } = session;
+        const { name } = session;
 
-        if (sportId in sportCounts) {
-          sportCounts[sportId]++;
+        if (name in sportCounts) {
+          sportCounts[name]++;
         } else {
-          sportCounts[sportId] = 1;
+          sportCounts[name] = 1;
         }
       });
 
@@ -262,8 +262,8 @@ module.exports = (sequelize, DataTypes) => {
         (a, b) => b[1] - a[1]
       );
 
-      return sortedSports.map(([sportId, count]) => ({
-        sportId,
+      return sortedSports.map(([name, count]) => ({
+        name,
         count,
       }));
     }

@@ -45,7 +45,8 @@
         <div class="col-start-3 col-span-3 mb-2">
           <div class="bg-indigo-100 rounded p-4 mt-8">
             <h1 class="text-2xl font-bold mb-4">Total Sessions Report</h1>
-            <h2 class="text-lg font-semibold mb-2">Total number of sessions scheduled: <%= sessioncount %></h2>
+            <h2 class="text-lg font-semibold mb-2">Total number of sessions scheduled: <%= sessioncount + c_sessioncount %></h2>
+            <h2 class="text-lg font-semibold mb-2">Ongoing sessions: <%= sessioncount %></h2>
             <h2 class="text-lg font-semibold">Cancelled sessions: <%= c_sessioncount %></h2>
           </div>
 
