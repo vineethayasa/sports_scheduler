@@ -337,8 +337,8 @@ app.post(
   connectEnsureLogin.ensureLoggedIn(),
   requirePublisher,
   async (request, response) => {
-    const sport = await Sport.getSportByName(request.params.name)
-    const sportid = sport.id
+    const sport = await Sport.getSportByName(request.params.name);
+    const sportid = sport.id;
     if (!request.body.sport_name) {
       request.flash("error", "Sport name cannot be empty");
       return response.redirect(`/editsport/${request.params.name}/${sportid}`);
@@ -409,13 +409,20 @@ app.post(
     const sportid = sport.id;
     const url = `/sportsession/${sportname}/${sportid}`;
     const today_date = new Date();
-    const session_date = new Date(request.body.date);
+
+    var datetime = new Date(request.body.date);
+
+    datetime.setHours(datetime.getHours() - 5);
+    datetime.setMinutes(datetime.getMinutes() - 30);
+
+    var newdate = datetime.toISOString().slice(0, 16);
+    console.log(newdate);
 
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
       return response.redirect(url);
     }
-    if (session_date < today_date) {
+    if (newdate < today_date) {
       request.flash("error", "You cannot enter a past date");
       return response.redirect(url);
     }
@@ -437,7 +444,7 @@ app.post(
       const intplayers = stringplayers.map(Number);
       const session = await Session.addSession({
         name: request.body.name,
-        date: request.body.date,
+        date: newdate,
         address: request.body.address,
         players: intplayers,
         count: request.body.count,
@@ -545,13 +552,21 @@ app.post(
     const sportid = session.sportId;
     const sportname = session.name;
     const url = `/editsession/${request.params.id}/${sportid}/${sportname}`;
-    session_date = new Date(request.body.date);
     today_date = new Date();
+
+    var datetime = new Date(request.body.date);
+
+    datetime.setHours(datetime.getHours() - 5);
+    datetime.setMinutes(datetime.getMinutes() - 30);
+
+    var newdate = datetime.toISOString().slice(0, 16);
+    console.log(newdate);
+
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
       return response.redirect(url);
     }
-    if (session_date < today_date) {
+    if (newdate < today_date) {
       request.flash("error", "You cannot enter a past date");
       return response.redirect(url);
     }
@@ -568,6 +583,8 @@ app.post(
       return response.redirect(url);
     }
     try {
+      request.body.date = newdate;
+      console.log(request.body);
       const session = await Session.updateSession(
         request.params.id,
         request.body

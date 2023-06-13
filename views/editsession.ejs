@@ -7,18 +7,6 @@
     <meta name="csrf-token" content= "<%= csrfToken %>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="/css/styles.css" rel="stylesheet" />
-    <script>
-      function subtractDateTime() {
-        var date_input = document.getElementById('date').value;
-        var datetime = new Date(date_input);
-
-        datetime.setHours(datetime.getHours() - 5);
-        datetime.setMinutes(datetime.getMinutes() - 30);
-  
-        var newdate = datetime.toISOString().slice(0, 16);
-        document.getElementById('date').value = newdate;
-      }
-    </script>
   </head>
   <body>
     <%- include("header.ejs") %> 
