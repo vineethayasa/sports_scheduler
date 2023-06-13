@@ -415,14 +415,11 @@ app.post(
     datetime.setHours(datetime.getHours() - 5);
     datetime.setMinutes(datetime.getMinutes() - 30);
 
-    var newdate = datetime.toISOString().slice(0, 16);
-    console.log(newdate);
-
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
       return response.redirect(url);
     }
-    if (newdate < today_date) {
+    if (datetime < today_date) {
       request.flash("error", "You cannot enter a past date");
       return response.redirect(url);
     }
@@ -444,7 +441,7 @@ app.post(
       const intplayers = stringplayers.map(Number);
       const session = await Session.addSession({
         name: request.body.name,
-        date: newdate,
+        date: datetime,
         address: request.body.address,
         players: intplayers,
         count: request.body.count,
@@ -559,14 +556,11 @@ app.post(
     datetime.setHours(datetime.getHours() - 5);
     datetime.setMinutes(datetime.getMinutes() - 30);
 
-    var newdate = datetime.toISOString().slice(0, 16);
-    console.log(newdate);
-
     if (!request.body.date) {
       request.flash("error", "Date cannot be empty");
       return response.redirect(url);
     }
-    if (newdate < today_date) {
+    if (datetime < today_date) {
       request.flash("error", "You cannot enter a past date");
       return response.redirect(url);
     }
@@ -583,7 +577,7 @@ app.post(
       return response.redirect(url);
     }
     try {
-      request.body.date = newdate;
+      request.body.date = datetime;
       console.log(request.body);
       const session = await Session.updateSession(
         request.params.id,
