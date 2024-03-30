@@ -1,14 +1,14 @@
 {
   "development": {
     "username": "postgres",
-    "password": "srinivas299",
+    "password": "vineetha299",
     "database": "sports-db",
     "host": "127.0.0.1",
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
-    "password": "srinivas299",
+    "password": "vineetha299",
     "database": "sports-db-test",
     "host": "127.0.0.1",
     "dialect": "postgres"
