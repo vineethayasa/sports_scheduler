@@ -1,40 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <meta name="csrf-token" content= "<%= csrfToken %>">
-    <link href="/css/styles.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <%- include("header.ejs") %> 
-    <div style="display: flex;" class="mb-8 mt-4">
-      <a href="/home" class="underline text-indigo-700 text-xl mr-2 ml-5">Home</a>
-      <a href="/sport_main/<%= sport_id %>" class="underline text-indigo-700 text-xl"><%= sport_name %></a>
-    </div>
-    <div class="flex items-center justify-center mt-40">
-      <div class="bg-indigo-100 rounded-lg shadow-lg p-10">
-        <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Edit sport</h2>
-        <form action="/editsport/<%= sport_name %>" method="post">
-          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <div class="mb-6">
-            <label for="sport_name" class="text-indigo-700 mb-4">Rename Sport</label>
-            <input type="text" name="sport_name" class="bg-gray-100 text-gray-900 rounded p-2 w-full mt-4">
-          </div>
-          <div class="flex justify-center">
-            <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">Update</button>
-          </div>
-        </form>
-        <div class="mt-4 text-red-600">
-          <% if(messages && messages.error && messages.error.length > 0)  { %>
-            <% for(var i=0; i<messages.error.length; i++) { %>
-                    <li> <%= messages.error[i] %></li>
-            <% } %>
-          <% } %>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="./css/styles.css" rel="stylesheet">
+  <title>Sports Scheduler</title>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <%- include("header.ejs") %>
+
+  <!-- Navigation -->
+  <nav class="flex mt-8 text-xl ml-4 font-medium">
+    <a href="/home" class="text-indigo-700 underline text-xl mr-2">Home</a>
+    <a href="/sport_main/<%= sport_id %>" class="underline text-indigo-700 text-xl"><%= sport_name %></a>
+  </nav>
+
+  <!-- Form Section -->
+  <div class="flex items-center justify-center mt-12">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+
+      <!-- Form Title -->
+      <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">Edit Sport</h2>
+
+      <!-- Form -->
+      <form action="/editsport/<%= sport_name %>" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="mb-6">
+          <input type="text" name="sport_name" placeholder="Rename Sport" class="bg-gray-100 text-gray-900 rounded p-2 w-full mt-2 focus:outline-none focus:ring focus:border-indigo-500">
         </div>
+        <div class="flex justify-center">
+          <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">Submit</button>
+        </div>
+      </form>
+
+      <!-- Error Messages -->
+      <div class="mt-4 text-red-600">
+        <% if(messages && messages.error && messages.error.length > 0)  { %>
+          <ul>
+            <% for(var i=0; i<messages.error.length; i++) { %>
+              <li><%= messages.error[i] %></li>
+            <% } %>
+          </ul>
+        <% } %>
       </div>
+
     </div>
-  </body>
+  </div>
+
+</body>
 </html>

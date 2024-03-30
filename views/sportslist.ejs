@@ -1,14 +1,16 @@
-<div class="mt-5">
+<div>
+    <h1 class="text-2xl text-indigo-700 font-bold"><%= title %></h1>
     <% if (data.length > 0) { %>
-        <h1 class="text-2xl text-indigo-700 font-bold"><%= title %></h1>
         <ul class="list-disc">
             <% for (var i =0; i <data.length;  i++ ) { %>
-                <li class="Sports-Item">
+                <li class="Sports-Item ml-2">
                     <a class="flex items-center py-1 px-2 my-1 text-xl hover:underline" href="/sport_main/<%= data[i].id %>">
                         <%= data[i].sport_name %>
                     </a>
-                  </li>
+                </li>
             <% } %>
         </ul>
-    <%} %>
+    <% } else { %>
+        <p class="text-lg font-semibold mt-2">There are currently no sports available</p>
+    <% } %>
 </div>

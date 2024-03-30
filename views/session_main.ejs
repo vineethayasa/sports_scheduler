@@ -1,58 +1,58 @@
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <meta name="csrf-token" content="<%= csrfToken %>">
-    <link href="/css/styles.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>  
-  <body>
-    <%- include("header.ejs") %> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <link href="/css/styles.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Sports Scheduler</title>
+</head>  
+<body class="bg-gray-100 font-sans">
+  <!-- Header -->
+  <%- include("header.ejs") %> 
+  <div class="container mx-auto px-4 py-8">
+    <!-- Main Content -->
     <div class="grid grid-cols-7 gap-6 px-4">
       <div class="col-start-1 col-span-2">
-        <div style="display: flex;" class="mb-8 mt-4">
+        <div class="mb-8 mt-4">
           <a href="/home" class="underline text-indigo-700 text-xl mr-2 ml-2">Home</a>
           <a href="/sport_main/<%= sportid %>" class="underline text-indigo-700 text-xl"><%= session_name %></a>
         </div>
       </div>
-      <div class="col-start-3 col-span-3">
+      <div class="col-start-3 col-span-3 bg-white rounded-lg shadow-md p-9">
         <div class="flex justify-between items-center">
-          <h1 class="text-3xl mb-4 font-bold mt-6 text-indigo-700"><%= session_name %> Session #<%= session_id %></h1>
+          <h1 class="text-3xl mb-4 font-bold mt-3 text-indigo-700"><%= session_name %> Session #<%= session_id %></h1>
           <%if (session_creator === userid && flag==0) { %>
             <span>
-              <a href="/editsession/<%= session_id %>/<%= sportid %>/<%= session_name %>" class="mr-10 underline text-indigo-700 text-xl">Edit</a>
-              <a href="/cancelsession/<%= session_id %>/<%= sportid %>/<%= session_name %>" class="underline text-indigo-700 text-xl">Cancel</a>
+              <a href="/editsession/<%= session_id %>/<%= sportid %>/<%= session_name %>" class="underline text-indigo-700 text-lg mr-2 hover:underline">Edit</a>
+              <a href="/cancelsession/<%= session_id %>/<%= sportid %>/<%= session_name %>" class="underline text-indigo-700 text-lg hover:underline">Cancel</a>
             </span>
           <% } %>
         </div>
-
-        <p class="text-xl mb-6">This session is scheduled for <%= session_date %> <%= session_time %> at <%= session_address %></p>
+        <p class="text-lg mb-6">This session is scheduled for <%= session_date %> <%= session_time %> at <%= session_address %></p>
         <h1 class="text-2xl font-bold text-indigo-700">Players</h1>
         <%- include("players.ejs",{flag:flag}) %> 
-
         <%if (flag==0) { %>
-          <div style="display: flex;">
-            <a id="sessionLink" class="text-indigo-700 underline text-xl mr-10" href="/joinsession/<%= session_id %>" >Join Session</a>
-            <a class="text-indigo-700 underline text-xl" href="/leavesession/<%= session_id %>" >Leave Session</a>
+          <div class="flex">
+            <a id="sessionLink" class="text-indigo-700 underline text-lg mr-10 hover:underline" href="/joinsession/<%= session_id %>" >Join Session</a>
+            <a class="text-indigo-700 underline text-lg hover:underline" href="/leavesession/<%= session_id %>" >Leave Session</a>
           </div>
         <% } %>
-
         <%if (flag==2) { %>
           <h1 class="text-xl font-bold text-indigo-700 mt-2 mb-2">REASON FOR CANCELLATION :</h1>
-          <p class="text-l  text-indigo-900 "><%= session_reason %></p>
+          <p class="text-l text-indigo-900 "><%= session_reason %></p>
         <% } %>
         <div class="mt-4 text-red-600">
           <% if(messages && messages.error && messages.error.length > 0)  { %>
             <% for(var i=0; i<messages.error.length; i++) { %>
-                    <li> <%= messages.error[i] %></li>
+              <li><%= messages.error[i] %></li>
             <% } %>
           <% } %>
         </div>
-
-
       </div>
-      
     </div>
-  </body>
+  </div>
+</body>
 </html>

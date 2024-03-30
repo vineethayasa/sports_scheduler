@@ -1,66 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <meta content="<%= csrfToken %>" name="csrf-token">
-    <link href="/css/styles.css" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body>
-    <%- include("header.ejs") %> 
-    <div style="display: flex;" class="mt-4">
-      <a href="/home" class="underline text-indigo-700 text-xl ml-4">Home</a>
-    </div>
-    <div class="flex items-center justify-center">
-       <div>
-          <h2 class="text-3xl font-bold text-center text-indigo-900 mb-6">USER INFO</h2>
-          <form action="/profile" method="post">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-            <div class="mb-5">
-              <label for="firstName" class="text-indigo-700">First Name:</label>
-              <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
-                <%- currentuser.firstName %> 
-              </div>
-            </div>     
-            <div class="mb-5">
-                <label for="firstName" class="text-indigo-700">Last Name:</label>
-                <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
-                  <%- currentuser.lastName %> 
-                </div>
-            </div>
-            <div class="mb-5">
-                <label for="firstName" class="text-indigo-700">Email:</label>
-                <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
-                  <%- currentuser.email %> 
-                </div>
-            </div>  
-            <div class="mb-5">
-                <label for="firstName" class="text-indigo-700">Role:</label>
-                <div name="firstName" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
-                  <%- currentuser.role %> 
-                </div>
-            </div> 
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="<%= csrfToken %>">
+  <link href="/css/styles.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>User Profile</title>
+</head>
+<body class="bg-gray-100 font-sans">
 
-            <div class="mb-5">
-              <label for="password" class="text-indigo-700">Change Password ?</label>
-              <input type="password" name="oldpassword" placeholder="Enter old password" class="bg-gray-100 text-gray-900 rounded p-2 w-full mb-4">
-              <input type="password" name="newpassword" placeholder="Enter new password" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
-            </div>
-            
-            <div class="flex justify-center">
-              <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">Update</button>
-            </div>
-          </form>
-          <div class="mt-4 text-red-600">
-              <% if(messages && messages.error && messages.error.length > 0)  { %>
-                  <% for(var i=0; i<messages.error.length; i++) { %>
-                          <li> <%= messages.error[i] %></li>
-                  <% } %>
-              <% } %>
-          </div>
+  <!-- Header -->
+  <%- include("header.ejs") %> 
+
+  <!-- Navigation -->
+  <div class="mt-4 mx-5">
+    <a href="/home" class="underline text-indigo-700 text-xl mr-5">Home</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex items-center justify-center mb-2">
+    <div class="bg-white rounded-lg shadow-lg p-10 w-1/3">
+      <h2 class="text-3xl font-bold text-center text-indigo-700 mb-6">USER INFO</h2>
+      <form action="/profile" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="mb-6">
+          <label for="firstName" class="text-indigo-700">First Name:</label>
+          <input type="text" name="firstName" value="<%= currentuser.firstName %>" class="bg-gray-100 text-gray-900 rounded p-2 w-full" disabled>
+        </div>     
+        <div class="mb-6">
+          <label for="lastName" class="text-indigo-700">Last Name:</label>
+          <input type="text" name="lastName" value="<%= currentuser.lastName %>" class="bg-gray-100 text-gray-900 rounded p-2 w-full" disabled>
         </div>
+        <div class="mb-6">
+          <label for="email" class="text-indigo-700">Email:</label>
+          <input type="email" name="email" value="<%= currentuser.email %>" class="bg-gray-100 text-gray-900 rounded p-2 w-full" disabled>
+        </div>  
+        <div class="mb-6">
+          <label for="role" class="text-indigo-700">Role:</label>
+          <input type="text" name="role" value="<%= currentuser.role %>" class="bg-gray-100 text-gray-900 rounded p-2 w-full" disabled>
+        </div> 
+
+        <div class="mb-6">
+          <label for="oldpassword" class="text-indigo-700">Old Password:</label>
+          <input type="password" name="oldpassword" placeholder="Enter old password" class="bg-gray-100 text-gray-900 rounded p-2 w-full mb-2">
+        </div>
+        <div class="mb-6">
+          <label for="newpassword" class="text-indigo-700">New Password:</label>
+          <input type="password" name="newpassword" placeholder="Enter new password" class="bg-gray-100 text-gray-900 rounded p-2 w-full">
+        </div>
+        
+        <div class="flex justify-center">
+          <button type="submit" class="py-2 px-6 bg-indigo-700 text-white font-medium rounded hover:bg-indigo-800">Update</button>
+        </div>
+      </form>
+      <div class="mt-4 text-red-600">
+        <% if(messages && messages.error && messages.error.length > 0)  { %>
+          <% for(var i=0; i<messages.error.length; i++) { %>
+            <li><%= messages.error[i] %></li>
+          <% } %>
+        <% } %>
+      </div>
     </div>
-  </body>
+  </div>
+
+</body>
 </html>
